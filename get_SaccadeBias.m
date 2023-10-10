@@ -4,14 +4,14 @@
 clear; clc; close all;
 
 %% parameters
-for pp = [21, 22, 24, 26, 31, 32];
+for pp = [1:2];
 
-    oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
+    oneOrTwoD       = 2; oneOrTwoD_options = {'_1D','_2D'};
     plotResults     = 1;
 
     %% load epoched data of this participant data
-    param = getSubjParam_AnnaVidi1(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaVidi1','_'  param.subjName], 'eyedata');
+    param = getSubjParam(pp);
+    load([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
 
     %% add relevant behavioural file data
 
@@ -33,17 +33,20 @@ for pp = [21, 22, 24, 26, 31, 32];
     %% selection vectors for conditions -- this is where it starts to become interesting!
 
     % cued item location
-    targL = ismember(tl.trialinfo(:,1), [11,13,15]);
-    targR = ismember(tl.trialinfo(:,1), [12,14,16]);
+    targL = ismember(tl.trialinfo(:,1), [11,12,13,14]);
+    targR = ismember(tl.trialinfo(:,1), [15,16,17,18]);
 
-    captureL = ismember(tl.trialinfo(:,1), [11,14]);
-    captureR = ismember(tl.trialinfo(:,1), [12,13]);
+    cueL = ismember(tl.trialinfo(:,1), [12,14,15,17]);
+    cueR = ismember(tl.trialinfo(:,1), [11,13,16,18]);
 
-    % distractor timing
-    congruent =     ismember(tl.trialinfo(:,1), [11,12]);
-    neutral =       ismember(tl.trialinfo(:,1), [15,16]);
-    incongruent  =  ismember(tl.trialinfo(:,1), [13,14]);
-
+    % orientation direction change 
+    clockwise       =  ismember(tl.trialinfo(:,1), [11,12,15,16]);
+    anticlockwise   =  ismember(tl.trialinfo(:,1), [13,14,17,18]);
+    
+    % validity
+    valid = ismember(tl.trialinfo(:,1), [12,14,16,18]);
+    invalid = ismember(tl.trialinfo(:,1), [11,13,15,17]);
+       
     % channels
     chX = ismember(tl.label, 'eyeX');
     chY = ismember(tl.label, 'eyeY');
@@ -61,22 +64,24 @@ for pp = [21, 22, 24, 26, 31, 32];
     minDisplacement = 0;
     maxDisplacement = 1000;
 
-    if oneOrTwoD == 1     saccadesize = abs(shiftsX);
-    elseif oneOrTwoD == 2 saccadesize = abs(shiftsX+shiftsY*1i);
+    if oneOrTwoD == 1
+        saccadesizes = abs(shiftsX);
+    elseif oneOrTwoD == 2
+        saccadesizes = abs(shiftsX+shiftsY*1i);
     end
-    shiftsL = shiftsX<0 & (saccadesize>minDisplacement & saccadesize<maxDisplacement);
-    shiftsR = shiftsX>0 & (saccadesize>minDisplacement & saccadesize<maxDisplacement);
+    
+    shiftsL = shiftsX<0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement);
+    shiftsR = shiftsX>0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement);
 
     %% get relevant contrasts out
     saccade = [];
     saccade.time = times;
-    saccade.label = {'all','congruent','neutral','incongruent','congruent-vs-incongruent'};
+    saccade.label = {'all','valid','invalid','valid-invalid'};
 
-    for selection = [1:4] % conditions.
-        if     selection == 1  sel = ones(size(congruent));
-        elseif selection == 2  sel = congruent;
-        elseif selection == 3  sel = neutral;
-        elseif selection == 4  sel = incongruent;
+    for selection = [1:3] % conditions.
+        if     selection == 1  sel = ones(size(valid));
+        elseif selection == 2  sel = valid;
+        elseif selection == 3  sel = invalid;
         end
 
         saccade.toward(selection,:) =  (mean(shiftsL(targL&sel,:)) + mean(shiftsR(targR&sel,:))) ./ 2;
@@ -86,10 +91,10 @@ for pp = [21, 22, 24, 26, 31, 32];
     % add towardness field
     saccade.effect = (saccade.toward - saccade.away);
 
-    % add congruent vs. incongruent (essentially: how much toward distractor)
-    saccade.toward(end+1,:) = (saccade.toward([2],:) - saccade.toward([4],:)) ./ 2;
-    saccade.away(end+1,:)   = (saccade.away([2],:)   - saccade.away([4],:)) ./ 2;
-    saccade.effect(end+1,:) = (saccade.effect([2],:) - saccade.effect([4],:)) ./ 2;
+    % add valid vs. invalid (essentially: how much toward distractor)
+    saccade.toward(end+1,:) = (saccade.toward([2],:) - saccade.toward([3],:)) ./ 2;
+    saccade.away(end+1,:)   = (saccade.away([2],:)   - saccade.away([3],:)) ./ 2;
+    saccade.effect(end+1,:) = (saccade.effect([2],:) - saccade.effect([3],:)) ./ 2;
 
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
@@ -99,9 +104,9 @@ for pp = [21, 22, 24, 26, 31, 32];
 
     %% plot
     if plotResults
-        figure;    for sp = 1:5 subplot(2,3,sp); hold on; plot(saccade.time, saccade.toward(sp,:), 'r'); plot(saccade.time, saccade.away(sp,:), 'b'); title(saccade.label(sp)); legend({'toward','away'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;    for sp = 1:5 subplot(2,3,sp); hold on; plot(saccade.time, saccade.effect(sp,:), 'k'); plot(xlim, [0,0], '--k');                    title(saccade.label(sp)); legend({'effect'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;                                   hold on; plot(saccade.time, saccade.effect([1:5],:)); plot(xlim, [0,0], '--k'); legend(saccade.label([1:5]),'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k');
+        figure;    for sp = 1:4 subplot(2,3,sp); hold on; plot(saccade.time, saccade.toward(sp,:), 'r'); plot(saccade.time, saccade.away(sp,:), 'b'); title(saccade.label(sp)); legend({'toward','away'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
+        figure;    for sp = 1:4 subplot(2,3,sp); hold on; plot(saccade.time, saccade.effect(sp,:), 'k'); plot(xlim, [0,0], '--k');                    title(saccade.label(sp)); legend({'effect'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
+        figure;                                   hold on; plot(saccade.time, saccade.effect([1:4],:)); plot(xlim, [0,0], '--k'); legend(saccade.label([1:4]),'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k');
         drawnow;
     end
 
@@ -113,7 +118,7 @@ for pp = [21, 22, 24, 26, 31, 32];
     saccadesize.dimord = 'chan_freq_time';
     saccadesize.freq = halfbin:0.1:7-halfbin; % shift sizes, as if "frequency axis" for time-frequency plot
     saccadesize.time = times;
-    saccadesize.label = {'all','congruent','neutral','incongruent','congruent-vs-incongruent'};
+    saccadesize.label = {'all','valid','invalid','valid-vs-invalid'};
 
     cnt = 0;
     for sz = saccadesize.freq;
@@ -122,12 +127,11 @@ for pp = [21, 22, 24, 26, 31, 32];
         shiftsR = [];
         shiftsL = shiftsX<-sz+halfbin & shiftsX > -sz-halfbin; % left shifts within this range
         shiftsR = shiftsX>sz-halfbin  & shiftsX < sz+halfbin; % right shifts within this range
-
-        for selection = [1:4] % conditions.
-            if     selection == 1  sel = ones(size(congruent));
-            elseif selection == 2  sel = congruent;
-            elseif selection == 3  sel = neutral;
-            elseif selection == 4  sel = incongruent;
+    
+       for selection = [1:3] % conditions.
+            if     selection == 1  sel = ones(size(valid));
+            elseif selection == 2  sel = valid;
+            elseif selection == 3  sel = invalid;
             end
 
             saccadesize.toward(selection,cnt,:) = (mean(shiftsL(targL&sel,:)) + mean(shiftsR(targR&sel,:))) ./ 2;
@@ -139,9 +143,9 @@ for pp = [21, 22, 24, 26, 31, 32];
     saccadesize.effect = (saccadesize.toward - saccadesize.away);
 
     % add congruent vs. incongruent (essentially: how much toward distractor)
-    saccadesize.toward(end+1,:,:) = (saccadesize.toward([2],:,:) - saccadesize.toward([4],:,:)) ./ 2;
-    saccadesize.away(end+1,:,:)   = (saccadesize.away([2],:,:)   - saccadesize.away([4],:,:)) ./ 2;
-    saccadesize.effect(end+1,:,:) = (saccadesize.effect([2],:,:) - saccadesize.effect([4],:,:)) ./ 2;
+    saccadesize.toward(end+1,:,:) = (saccadesize.toward([2],:,:) - saccadesize.toward([3],:,:)) ./ 2;
+    saccadesize.away(end+1,:,:)   = (saccadesize.away([2],:,:)   - saccadesize.away([3],:,:)) ./ 2;
+    saccadesize.effect(end+1,:,:) = (saccadesize.effect([2],:,:) - saccadesize.effect([3],:,:)) ./ 2;
 
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
@@ -155,7 +159,7 @@ for pp = [21, 22, 24, 26, 31, 32];
         cfg.figure = 'gcf';
         %cfg.zlim = [-0.01, 0.01];
         figure;
-        for chan = 1:5
+        for chan = 1:4
             cfg.channel = chan;
             subplot(2,3,chan); ft_singleplotTFR(cfg, saccadesize);
         end

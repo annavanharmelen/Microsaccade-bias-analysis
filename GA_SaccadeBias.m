@@ -60,13 +60,8 @@ colour_map = colour_map/255;
 ft_size = 26;
     
 %% parameters
-% pp2do           = [21, 22, 24, 26, 31, 32];
-% pp2do           = [17:20,23,25,27:30,33:41];
-% pp2do           = [1:16];
-pp2do           = [17:41];
-% pp2do           = [17, 18, 21, 22, 23, 24, 26, 29, 30, 31, 32, 35]; %yes capture rt, based on minimum diff of 19.5 ms (incon vs con)
-% pp2do           = [19, 20, 25, 27, 28, 33, 34, 36, 37, 38, 39, 40, 41]; %no capture rt, based on minimum diff of 19.5 ms (incon vs con)
-oneOrTwoD       = 1;        oneOrTwoD_options = {'_1D','_2D'};
+pp2do           = [1:2];
+oneOrTwoD       = 2;        oneOrTwoD_options = {'_1D','_2D'};
 nsmooth         = 200;
 plotSinglePps   = 0;
 plotGAs         = 0;
