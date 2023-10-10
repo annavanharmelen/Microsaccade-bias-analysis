@@ -1,4 +1,4 @@
-function [bar_size, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum] = setBehaviourParam(pp2do)
+function [bar_size, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do)
 %SETBEHAVIOURPARAM Summary of this function goes here
 %   Detailed explanation goes here
 bar_size = 0.8;
@@ -24,5 +24,7 @@ error = zeros(size(pp2do, 2), size(labels, 2) + 1);
 overall_dt = zeros(size(pp2do));
 overall_error = zeros(size(pp2do));
 ppnum = zeros(size(pp2do));
+
+subplot_size = sqrt(size(pp2do, 2));
 end
 
