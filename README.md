@@ -16,11 +16,11 @@ To make sure the scripts run correctly, open the getSubjParam.m file to either..
 ## Running
 The analysis runs in multiple parts, some of which are dependent on each other.
 
-All main behavioural data is analysed in get_behaviour.m.
+All main behavioural data is analysed in getBehaviour.m.
 
 All eye-tracking data is analysed by entering the desired participantnumbers into these scripts, and then running them in precisely this sequence:
-1. epoch_eye_data.m
-2. get_gazePositionBias.m and get_saccadeBias.m
-3. GA_gazePositionBias.m and GA_saccadeBias.m
+1. epochEyeData.m
+2. get_GazePositionBias.m and get_SaccadeBias.m
+3. GA_GazePositionBias.m and GA_SaccadeBias.m
 
 Note that most of these eye-tracking analysis scripts are dependent on the 'frevede_' functions in the repository, and also on the [Fieldtrip toolbox](https://www.fieldtriptoolbox.org/download.php). 
