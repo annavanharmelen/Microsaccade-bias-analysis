@@ -11,7 +11,7 @@ plot_averages = 1;
 pp2do = 1; 
 p = 0;
 
-[bar_size, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do)
+[bar_size, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do);
 
 for pp = pp2do
 p = p+1;
@@ -71,6 +71,10 @@ post_pos_69_53_trials = ismember(behdata.target_post_orientation, [53:69]);
 post_pos_53_37_trials = ismember(behdata.target_post_orientation, [37:53]);
 post_pos_37_21_trials = ismember(behdata.target_post_orientation, [21:37]);
 post_pos_21_5_trials = ismember(behdata.target_post_orientation, [3:21]);
+
+length_500
+length_800
+length_1100
 %% extract data of interest
 missed_valid_trials = sum(valid_trials&missed_trials) / sum(valid_trials);
 missed_invalid_trials = sum(invalid_trials&missed_trials) / sum(invalid_trials);
@@ -80,10 +84,27 @@ missed_green_trials = sum(green_target_trials&missed_trials) / sum(green_target_
 missed_orange_trials = sum(orange_target_trials&missed_trials) / sum(orange_target_trials);
 missed_pink_trials = sum(pink_target_trials&missed_trials) / sum(pink_target_trials);
 
-missed_orientations = [
-    sum(pre_neg_85_69_trials&missed_trials) / sum(pre_neg_85_69_trials), sum(post_neg_85_69_trials&missed_trials) / sum(post_neg_85_69_trials);
-    sum(pre_neg_69_53_trials&missed_trials) / sum(pre_neg_69_53_trials), sum(post_neg_69_53_trials&missed_trials) / sum(post_neg_85_69_trials);
-    ];
-% Anna dit moet gewoon een forloop worden
+missed_clockwise_trials = sum(clockwise_trials&missed_trials) / sum(clockwise_trials);
+missed_anticlockwise_trials = sum(anticlockwise_trials&missed_trials) / sum(anticlockwise_trials);
+
+orientation_bins = [-85:16:-5, 5:16:85];
+missed_orientations = zeros(size(orientation_bins, 2) - 1, 4);
+
+for i = 1:(size(orientation_bins, 2) - 1)
+    missed_orientations(i, 1) = orientation_bins(i);
+    missed_orientations(i, 2) = orientation_bins(i+1);
+    
+    if i < 5 || (i < 11 && i > 6)
+        idx = ismember(behdata.target_pre_orientation, orientation_bins(i):(orientation_bins(i+1) - 1));
+    elseif i == 5 || i == 11
+        idx = ismember(behdata.target_pre_orientation, orientation_bins(i):orientation_bins(i+1));
+    else
+        idx = ismember(behdata.target_pre_orientation, (orientation_bins(i) + 1):(orientation_bins(i+1) - 1));
+    end
+    
+    missed_orientations(i, 3) = sum(idx&missed_trials) / sum(idx);
+    missed_orientations(i, 4) = sum(idx);
+end
+
 
 end
