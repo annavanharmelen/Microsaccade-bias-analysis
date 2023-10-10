@@ -25,6 +25,6 @@ overall_dt = zeros(size(pp2do));
 overall_error = zeros(size(pp2do));
 ppnum = zeros(size(pp2do));
 
-subplot_size = sqrt(size(pp2do, 2));
+subplot_size = ceil(sqrt(size(pp2do, 2)));
 end
 
