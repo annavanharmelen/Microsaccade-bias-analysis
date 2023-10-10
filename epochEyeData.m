@@ -4,15 +4,15 @@
 clear; clc; close all;
 
 %% set loops
-for pp      = [39:41];
+for pp      = [1:2];
 
 %% Set trig labels and epoch timings
-values2use  = 11:16; % capture-cue onset
+values2use  = 21:28; % cue onset
 prestim     = -0.5; % 
-poststim    = 3; % until 3 s after
+poststim    = 3.2; % until 3 s after
 
 %% participant-specific information
-param = getSubjParam_AnnaVidi1(pp); 
+param = getSubjParam(pp); 
 disp(['getting data from ', param.subjName]);
 
 %% read header of asc file that contains all messages etc.
@@ -81,7 +81,7 @@ cfg.channel = {'eyeX','eyeY','eyePupil'};
 eyedata = ft_selectdata(cfg, eyedata);
 
 %% save data as function of pp name and eyedata session
-save([param.path, '\epoched_data\eyedata_AnnaVidi1','_'  param.subjName], 'eyedata');
+save([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
 
 %% test plot
 figure; 
