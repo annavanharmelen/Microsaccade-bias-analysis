@@ -3,7 +3,7 @@ function param = getSubjParam(pp)
 %% participant-specific notes
 
 %% set path and pp-specific file locations
-unique_numbers = [92, 78]; %needs to be in the right order
+unique_numbers = [92, 78, 18]; %needs to be in the right order
 
 param.path = 'C:\Users\annav\Documents\Jottacloud\Neuroscience PhD\Experiments\Microsaccade bias experiments\Data\pilot\';
 
