@@ -6,7 +6,7 @@ clear; clc; close all;
 %% parameters
 for pp = [1:2];
 
-    oneOrTwoD       = 2; oneOrTwoD_options = {'_1D','_2D'};
+    oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
     plotResults     = 1;
 
     %% load epoched data of this participant data
@@ -33,19 +33,19 @@ for pp = [1:2];
     %% selection vectors for conditions -- this is where it starts to become interesting!
 
     % cued item location
-    targL = ismember(tl.trialinfo(:,1), [11,12,13,14]);
-    targR = ismember(tl.trialinfo(:,1), [15,16,17,18]);
+    targL = ismember(tl.trialinfo(:,1), [21,22,23,24]);
+    targR = ismember(tl.trialinfo(:,1), [25,26,27,28]);
 
-    cueL = ismember(tl.trialinfo(:,1), [12,14,15,17]);
-    cueR = ismember(tl.trialinfo(:,1), [11,13,16,18]);
+    cueL = ismember(tl.trialinfo(:,1), [22,24,25,27]);
+    cueR = ismember(tl.trialinfo(:,1), [21,23,26,28]);
 
     % orientation direction change 
-    clockwise       =  ismember(tl.trialinfo(:,1), [11,12,15,16]);
-    anticlockwise   =  ismember(tl.trialinfo(:,1), [13,14,17,18]);
+    clockwise       =  ismember(tl.trialinfo(:,1), [21,22,25,26]);
+    anticlockwise   =  ismember(tl.trialinfo(:,1), [23,24,27,28]);
     
     % validity
-    valid = ismember(tl.trialinfo(:,1), [12,14,16,18]);
-    invalid = ismember(tl.trialinfo(:,1), [11,13,15,17]);
+    valid = ismember(tl.trialinfo(:,1), [22,24,26,28]);
+    invalid = ismember(tl.trialinfo(:,1), [21,23,25,27]);
        
     % channels
     chX = ismember(tl.label, 'eyeX');
@@ -79,13 +79,17 @@ for pp = [1:2];
     saccade.label = {'all','valid','invalid','valid-invalid'};
 
     for selection = [1:3] % conditions.
-        if     selection == 1  sel = ones(size(valid));
+        if     selection == 1  sel = ones(size(cueL));
         elseif selection == 2  sel = valid;
         elseif selection == 3  sel = invalid;
         end
 
-        saccade.toward(selection,:) =  (mean(shiftsL(targL&sel,:)) + mean(shiftsR(targR&sel,:))) ./ 2;
-        saccade.away(selection,:)  =   (mean(shiftsL(targR&sel,:)) + mean(shiftsR(targL&sel,:))) ./ 2;
+        saccade.toward(selection,:) =  (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
+        saccade.away(selection,:)  =   (mean(shiftsL(cueR&sel,:)) + mean(shiftsR(cueL&sel,:))) ./ 2;
+        saccade.cueLtoward(selection,:) =  (mean(shiftsL(cueL&sel,:)));
+        saccade.cueLaway(selection,:) =  (mean(shiftsR(cueL&sel,:)));
+        saccade.cueRtoward(selection,:)  =   (mean(shiftsR(cueR&sel,:)));
+        saccade.cueRaway(selection,:)  =   (mean(shiftsL(cueR&sel,:)));
     end
 
     % add towardness field
@@ -101,12 +105,17 @@ for pp = [1:2];
     saccade.toward = smoothdata(saccade.toward,2,'movmean',integrationwindow)*1000; % *1000 to get to Hz, given 1000 samples per second.
     saccade.away   = smoothdata(saccade.away,2,  'movmean',integrationwindow)*1000;
     saccade.effect = smoothdata(saccade.effect,2,'movmean',integrationwindow)*1000;
+    saccade.cueLtoward = smoothdata(saccade.cueLtoward,2,'movmean', integrationwindow)*1000;
+    saccade.cueRtoward = smoothdata(saccade.cueRtoward,2,'movmean', integrationwindow)*1000;
+    saccade.cueLaway = smoothdata(saccade.cueLaway,2,'movmean', integrationwindow)*1000;
+    saccade.cueRaway = smoothdata(saccade.cueRaway,2,'movmean', integrationwindow)*1000;
 
     %% plot
     if plotResults
-        figure;    for sp = 1:4 subplot(2,3,sp); hold on; plot(saccade.time, saccade.toward(sp,:), 'r'); plot(saccade.time, saccade.away(sp,:), 'b'); title(saccade.label(sp)); legend({'toward','away'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;    for sp = 1:4 subplot(2,3,sp); hold on; plot(saccade.time, saccade.effect(sp,:), 'k'); plot(xlim, [0,0], '--k');                    title(saccade.label(sp)); legend({'effect'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;                                   hold on; plot(saccade.time, saccade.effect([1:4],:)); plot(xlim, [0,0], '--k'); legend(saccade.label([1:4]),'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k');
+        figure;    for sp = 1:3 subplot(2,3,sp); hold on; plot(saccade.time, saccade.toward(sp,:), 'r'); plot(saccade.time, saccade.away(sp,:), 'b'); title(saccade.label(sp)); legend({'toward','away'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
+        figure;    for sp = 1:3 subplot(2,3,sp); hold on; plot(saccade.time, saccade.effect(sp,:), 'k'); plot(xlim, [0,0], '--k');                    title(saccade.label(sp)); legend({'effect'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
+        figure;    hold on; plot(saccade.time, saccade.cueLtoward(sp,:), 'b'); plot(saccade.time, saccade.cueLaway(sp,:), 'r'); plot(saccade.time, saccade.cueRtoward(sp,:), '--b'); plot(saccade.time, saccade.cueRaway(sp,:), '--r'); hold off
+        figure;                                   hold on; plot(saccade.time, saccade.effect([1:3],:)); plot(xlim, [0,0], '--k'); legend(saccade.label([1:4]),'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k');
         drawnow;
     end
 
@@ -130,12 +139,12 @@ for pp = [1:2];
     
        for selection = [1:3] % conditions.
             if     selection == 1  sel = ones(size(valid));
-            elseif selection == 2  sel = valid;
-            elseif selection == 3  sel = invalid;
+            elseif selection == 2  sel = ones(size(valid));
+            elseif selection == 3  sel = ones(size(valid));
             end
 
-            saccadesize.toward(selection,cnt,:) = (mean(shiftsL(targL&sel,:)) + mean(shiftsR(targR&sel,:))) ./ 2;
-            saccadesize.away(selection,cnt,:) =   (mean(shiftsL(targR&sel,:)) + mean(shiftsR(targL&sel,:))) ./ 2;
+            saccadesize.toward(selection,cnt,:) = (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
+            saccadesize.away(selection,cnt,:) =   (mean(shiftsL(cueR&sel,:)) + mean(shiftsR(cueL&sel,:))) ./ 2;
         end
 
     end
@@ -157,9 +166,9 @@ for pp = [1:2];
         cfg = [];
         cfg.parameter = 'effect';
         cfg.figure = 'gcf';
-        %cfg.zlim = [-0.01, 0.01];
+        cfg.zlim = 'maxabs';
         figure;
-        for chan = 1:4
+        for chan = 1:3
             cfg.channel = chan;
             subplot(2,3,chan); ft_singleplotTFR(cfg, saccadesize);
         end
@@ -172,5 +181,3 @@ for pp = [1:2];
 
     %% close loops
 end % end pp loop
-
-
