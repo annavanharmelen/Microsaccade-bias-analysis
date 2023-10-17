@@ -5,7 +5,7 @@ function param = getSubjParam(pp)
 %% set path and pp-specific file locations
 unique_numbers = [99, 26, 32]; %needs to be in the right order
 
-param.path = 'C:\Users\annav\Documents\Jottacloud\Neuroscience PhD\Experiments\Microsaccade bias experiments\Data\pilot\';
+param.path = 'C:\Users\annav\Documents\Jottacloud\Neuroscience PhD\Experiments\Microsaccade bias experiments\Data\';
 
 if pp < 10
     param.subjName = sprintf('pp0%d', pp);
