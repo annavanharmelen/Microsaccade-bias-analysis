@@ -1,19 +1,18 @@
-function [bar_size, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do)
+function [bar_size, bright_colours, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do)
 %SETBEHAVIOURPARAM Summary of this function goes here
 %   Detailed explanation goes here
 bar_size = 0.8;
 
-colours = [114, 182, 161;...
-           149, 163, 192;...
-           233, 150, 117;...
-           194, 102, 162];
+bright_colours=[84, 206, 116;...
+                156, 138, 238];
+bright_colours = bright_colours/255;
+
+colours = [120, 186, 137;...
+           161, 153, 196];
 colours = colours/255;
 
-dark_colours = [50, 79, 70;
-                58, 67, 88;
-                105, 67, 52;
-                92, 49, 77];
-
+dark_colours = [46, 71, 52;...
+                63, 55, 102];
 dark_colours = dark_colours/255;
 
 labels = {'valid','invalid'};
