@@ -4,9 +4,9 @@ clc
 
 %% set parameters and loops
 see_performance = 0;
-display_percentageok = 1;
-plot_individuals = 1;
-plot_averages = 1;
+display_percentage_premature = 1;
+plot_individuals = 0;
+plot_averages = 0;
 
 pp2do = [1:3]; 
 p = 0;
@@ -32,6 +32,10 @@ for pp = pp2do
     %% load actual behavioural data
     behdata = readtable(param.log);
     
+    %% display percentage prematurely pressed trials
+    if display_percentage_premature
+        fprintf('%s has %.2f%% premature responses\n\n', param.subjName, mean(ismember(behdata.premature_pressed, {'True'}))*100)
+    end
     %% basic data checks, each pp in own subplot
     if plot_individuals
         figure(figure_nr);
