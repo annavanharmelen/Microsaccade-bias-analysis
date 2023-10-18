@@ -3,12 +3,11 @@ close all
 clc
 
 %% set parameters and loops
-see_performance = 0;
 display_percentage_premature = 1;
-plot_individuals = 0;
-plot_averages = 0;
+plot_individuals = 1;
+plot_averages = 1;
 
-pp2do = [1:3]; 
+pp2do = [1:5]; 
 p = 0;
 
 
