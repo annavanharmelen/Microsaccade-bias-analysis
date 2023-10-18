@@ -60,12 +60,12 @@ colour_map = colour_map/255;
 ft_size = 26;
     
 %% parameters
-pp2do           = [1:2];
-oneOrTwoD       = 2;        oneOrTwoD_options = {'_1D','_2D'};
+pp2do           = [1:3];
+oneOrTwoD       = 1;        oneOrTwoD_options = {'_1D','_2D'};
 nsmooth         = 200;
 plotSinglePps   = 0;
-plotGAs         = 0;
-xlimtoplot      = [-500 1500];
+plotGAs         = 1;
+xlimtoplot      = [-500 3200];
 
 capture_cue_effect = [pp2do', zeros(size(pp2do, 2), 2)];
 %% load and aggregate the data from all pp
@@ -74,15 +74,15 @@ for pp = pp2do
     s = s+1;
 
     % get participant data
-    param = getSubjParam_AnnaVidi1(pp);
+    param = getSubjParam(pp);
 
     % load
     disp(['getting data from participant ', param.subjName]);
     load([param.path, '\saved_data\saccadeEffects', oneOrTwoD_options{oneOrTwoD} '__', param.subjName], 'saccade','saccadesize');
        
     % save averages (saccade effect (capture cue effect and probe cue reaction)
-    capture_cue_effect(s, 2) = mean(saccade.effect(5,saccade.time>=200 & saccade.time<=600));
-    capture_cue_effect(s, 3) = mean(mean(saccade.effect(2:4,saccade.time>=1500+200 & saccade.time<=1500+600)));
+    capture_cue_effect(s, 2) = mean(saccade.effect(2,saccade.time>=200 & saccade.time<=600));
+    capture_cue_effect(s, 3) = mean(mean(saccade.effect(2:3,saccade.time>=1500+200 & saccade.time<=1500+600)));
 
     % smooth?
     if nsmooth > 0
@@ -153,7 +153,7 @@ end
 if plotGAs
     % right and left cues, per condition
     figure;
-    for sp = 1:5
+    for sp = 1:3
         subplot(2,3,sp); hold on; title(saccade.label(sp));
         p1 = frevede_errorbarplot(saccade.time, squeeze(d1(:,sp,:)), [1,0,0], 'se');
         p2 = frevede_errorbarplot(saccade.time, squeeze(d2(:,sp,:)), [0,0,1], 'se');
@@ -173,7 +173,7 @@ if plotGAs
     legend({'effect'});
     
     %% towardness overlay of all conditions
-    ylimit = [-0.3, 0.4];
+    ylimit = [-0.5, 1.0];
 
     figure; hold on;
     % plot([0,0], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
