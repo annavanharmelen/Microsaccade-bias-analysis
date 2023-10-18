@@ -4,23 +4,21 @@
 clear; clc; close all;
 
 %% parameters
-for pp = [1:2];
+oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
+plotResults     = 1;
 
-    oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
-    plotResults     = 1;
+for pp = [4:5];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
     load([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
-
-    %% add relevant behavioural file data
 
     %% only keep channels of interest
     cfg = [];
     cfg.channel = {'eyeX','eyeY'}; % only keep x & y axis
     eyedata = ft_selectdata(cfg, eyedata); % select x & y channels
 
-    %% reformat such that all data in single matrix of trial x channel x time
+    %% reformat all data to a single matrix of trial x channel x time
     cfg = [];
     cfg.keeptrials = 'yes';
     tl = ft_timelockanalysis(cfg, eyedata); % realign the data: from trial*time cells into trial*channel*time?
@@ -56,8 +54,10 @@ for pp = [1:2];
     data_input = squeeze(tl.trial);
     time_input = tl.time*1000;
 
-    if oneOrTwoD == 1         [shiftsX, velocity, times]             = PBlab_gazepos2shift_1D(cfg, data_input(:,chX,:), time_input);
-    elseif oneOrTwoD == 2     [shiftsX,shiftsY, peakvelocity, times] = PBlab_gazepos2shift_2D(cfg, data_input(:,chX,:), data_input(:,chY,:), time_input);
+    if oneOrTwoD == 1
+        [shiftsX, velocity, times] = PBlab_gazepos2shift_1D(cfg, data_input(:,chX,:), time_input);
+    elseif oneOrTwoD == 2
+        [shiftsX,shiftsY, peakvelocity, times] = PBlab_gazepos2shift_2D(cfg, data_input(:,chX,:), data_input(:,chY,:), time_input);
     end
 
     %% select usable gaze shifts
@@ -79,17 +79,16 @@ for pp = [1:2];
     saccade.label = {'all','valid','invalid','valid-invalid'};
 
     for selection = [1:3] % conditions.
-        if     selection == 1  sel = ones(size(cueL));
-        elseif selection == 2  sel = valid;
-        elseif selection == 3  sel = invalid;
+        if     selection == 1
+            sel = ones(size(cueL));
+        elseif selection == 2
+            sel = valid;
+        elseif selection == 3
+            sel = invalid;
         end
 
         saccade.toward(selection,:) =  (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
         saccade.away(selection,:)  =   (mean(shiftsL(cueR&sel,:)) + mean(shiftsR(cueL&sel,:))) ./ 2;
-        saccade.cueLtoward(selection,:) =  (mean(shiftsL(cueL&sel,:)));
-        saccade.cueLaway(selection,:) =  (mean(shiftsR(cueL&sel,:)));
-        saccade.cueRtoward(selection,:)  =   (mean(shiftsR(cueR&sel,:)));
-        saccade.cueRaway(selection,:)  =   (mean(shiftsL(cueR&sel,:)));
     end
 
     % add towardness field
@@ -105,17 +104,41 @@ for pp = [1:2];
     saccade.toward = smoothdata(saccade.toward,2,'movmean',integrationwindow)*1000; % *1000 to get to Hz, given 1000 samples per second.
     saccade.away   = smoothdata(saccade.away,2,  'movmean',integrationwindow)*1000;
     saccade.effect = smoothdata(saccade.effect,2,'movmean',integrationwindow)*1000;
-    saccade.cueLtoward = smoothdata(saccade.cueLtoward,2,'movmean', integrationwindow)*1000;
-    saccade.cueRtoward = smoothdata(saccade.cueRtoward,2,'movmean', integrationwindow)*1000;
-    saccade.cueLaway = smoothdata(saccade.cueLaway,2,'movmean', integrationwindow)*1000;
-    saccade.cueRaway = smoothdata(saccade.cueRaway,2,'movmean', integrationwindow)*1000;
 
     %% plot
     if plotResults
-        figure;    for sp = 1:3 subplot(2,3,sp); hold on; plot(saccade.time, saccade.toward(sp,:), 'r'); plot(saccade.time, saccade.away(sp,:), 'b'); title(saccade.label(sp)); legend({'toward','away'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;    for sp = 1:3 subplot(2,3,sp); hold on; plot(saccade.time, saccade.effect(sp,:), 'k'); plot(xlim, [0,0], '--k');                    title(saccade.label(sp)); legend({'effect'},'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k'); end
-        figure;    hold on; plot(saccade.time, saccade.cueLtoward(sp,:), 'b'); plot(saccade.time, saccade.cueLaway(sp,:), 'r'); plot(saccade.time, saccade.cueRtoward(sp,:), '--b'); plot(saccade.time, saccade.cueRaway(sp,:), '--r'); hold off
-        figure;                                   hold on; plot(saccade.time, saccade.effect([1:3],:)); plot(xlim, [0,0], '--k'); legend(saccade.label([1:4]),'autoupdate', 'off'); plot([0,0], ylim, '--k');plot([1500,1500], ylim, '--k');
+
+        figure;
+        for sp = 1:3
+            subplot(2,3,sp);
+            hold on
+            plot(saccade.time, saccade.toward(sp,:), 'r');
+            plot(saccade.time, saccade.away(sp,:), 'b');
+            
+            title(saccade.label(sp));
+            legend({'toward','away'},'autoupdate', 'off');
+            plot([0,0], ylim, '--k');
+            plot([1500,1500], ylim, '--k');
+        end
+
+        figure;   
+            for sp = 1:3 subplot(2,3,sp);
+                hold on
+                plot(saccade.time, saccade.effect(sp,:), 'k')
+                plot(xlim, [0,0], '--k');
+                title(saccade.label(sp));
+                legend({'effect'},'autoupdate', 'off');
+                plot([0,0], ylim, '--k');
+                plot([1500,1500], ylim, '--k');
+            end
+
+        figure;
+        hold on
+        plot(saccade.time, saccade.effect([1:3],:));
+        plot(xlim, [0,0], '--k');
+        legend(saccade.label([1:4]),'autoupdate', 'off');
+        plot([0,0], ylim, '--k');
+        plot([1500,1500], ylim, '--k');
         drawnow;
     end
 
@@ -127,7 +150,7 @@ for pp = [1:2];
     saccadesize.dimord = 'chan_freq_time';
     saccadesize.freq = halfbin:0.1:7-halfbin; % shift sizes, as if "frequency axis" for time-frequency plot
     saccadesize.time = times;
-    saccadesize.label = {'all','valid','invalid','valid-vs-invalid'};
+    saccadesize.label = saccade.label;
 
     cnt = 0;
     for sz = saccadesize.freq;
@@ -138,9 +161,12 @@ for pp = [1:2];
         shiftsR = shiftsX>sz-halfbin  & shiftsX < sz+halfbin; % right shifts within this range
     
        for selection = [1:3] % conditions.
-            if     selection == 1  sel = ones(size(valid));
-            elseif selection == 2  sel = ones(size(valid));
-            elseif selection == 3  sel = ones(size(valid));
+            if selection == 1
+                sel = ones(size(valid));
+            elseif selection == 2
+                sel = valid;
+            elseif selection == 3
+                sel = invalid;
             end
 
             saccadesize.toward(selection,cnt,:) = (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
