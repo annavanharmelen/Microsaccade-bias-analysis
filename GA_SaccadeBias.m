@@ -4,63 +4,15 @@
 %% start clean
 clear; clc; close all;
 
-colours = [72, 224, 176;...
-           104, 149, 238;...
-           251, 129, 81;...
-           223, 52, 163];
-colours = colours/255;
+%% set visual parameters
+[bar_size, bright_colours, colours, dark_colours] = setBehaviourParam(1);
 
-colour_map = [36, 70, 167;
-              47, 78, 171;
-              58, 86, 175;
-              69, 94, 179;
-              80, 102, 183;
-              80, 102, 183;
-              91, 110, 187;
-              102, 117, 192;
-              113, 125, 196;
-              124, 133, 200;
-              135, 141, 204;
-              146, 149, 208;
-              157, 157, 212;
-              166, 166, 216;
-              175, 175, 220;
-              184, 184, 224;
-              193, 193, 228;
-              202, 202, 232;
-              210, 210, 235;
-              219, 219, 239;
-              228, 228, 243;
-              237, 237, 247;
-              246, 246, 251;
-              255, 255, 255;
-              254, 247, 247;
-              253, 238, 238;
-              252, 230, 230;
-              251, 222, 222;
-              250, 213, 214;
-              248, 205, 205;
-              247, 196, 197;
-              246, 188, 189;
-              245, 180, 181;
-              244, 171, 172;
-              243, 163, 164;
-              241, 154, 157;
-              239, 145, 151;
-              237, 137, 144;
-              235, 128, 137;
-              233, 119, 131;
-              232, 110, 124;
-              230, 101, 118;
-              228, 92, 111;
-              226, 84, 104;
-              224, 75, 98;
-              222, 66, 91];
-colour_map = colour_map/255;
+colour_map = create_colour_map(101);
+
 ft_size = 26;
     
 %% parameters
-pp2do           = [1:3];
+pp2do           = [1:5];
 oneOrTwoD       = 1;        oneOrTwoD_options = {'_1D','_2D'};
 nsmooth         = 200;
 plotSinglePps   = 0;
@@ -154,7 +106,7 @@ if plotGAs
     % right and left cues, per condition
     figure;
     for sp = 1:3
-        subplot(2,3,sp); hold on; title(saccade.label(sp));
+        subplot(2,2,sp); hold on; title(saccade.label(sp));
         p1 = frevede_errorbarplot(saccade.time, squeeze(d1(:,sp,:)), [1,0,0], 'se');
         p2 = frevede_errorbarplot(saccade.time, squeeze(d2(:,sp,:)), [0,0,1], 'se');
         plot(xlim, [0,0], '--k');
@@ -164,8 +116,8 @@ if plotGAs
     
     % towardness per condition - gaze shift effect X saccade size
     figure;
-    for sp = 1:5
-        subplot(2,3,sp); hold on; title(saccade.label(sp));
+    for sp = 1:4
+        subplot(2,2,sp); hold on; title(saccade.label(sp));
         frevede_errorbarplot(saccade.time, squeeze(d3(:,sp,:)), [0,0,0], 'both');
         plot(xlim, [0,0], '--k');
         xlim(xlimtoplot); ylim([-1.5 1.5]);
@@ -176,39 +128,37 @@ if plotGAs
     ylimit = [-0.5, 1.0];
 
     figure; hold on;
-    % plot([0,0], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([0,0], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     p1 = frevede_errorbarplot(saccade.time, squeeze(d3(:,2,:)), colours(1,:), 'se');
     p2 = frevede_errorbarplot(saccade.time, squeeze(d3(:,3,:)), colours(2,:), 'se');
-    p3 = frevede_errorbarplot(saccade.time, squeeze(d3(:,4,:)), colours(3,:), 'se');
     p1.LineWidth = 2.5;
     p2.LineWidth = 2.5;
-    p3.LineWidth = 2.5;
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0, 0], ylimit, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    % plot([1500, 1500], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([1500, 1500], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     xlim(xlimtoplot);
-    % yticks(linspace(-0.5, 1, 7));
-    set(gcf,'position',[0,0, 1800,900])
+    yticks(linspace(-0.5, 1, 7));
+    % set(gcf,'position',[0,0, 1800,900])
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
-    fontsize(ft_size*1.5,"points");
-    legend([p1,p2,p3], saccade.label(2:4), 'EdgeColor', 'w', 'Location', 'northeast');
+    % fontsize(ft_size*1.5,"points");
+    legend([p1,p2], saccade.label(2:3), 'EdgeColor', 'w', 'Location', 'northeast');
     ylim(ylimit);
 
     ylimit2 = [-0.3, 0.3];
     figure;
     % subplot(1,2,1);
     hold on;
-    p1 = frevede_errorbarplot(saccade.time, squeeze(d3(:,5,:)), colours(4,:), 'both');
+    p1 = frevede_errorbarplot(saccade.time, squeeze(d3(:,4,:)), colours(2,:), 'both');
     p1.LineWidth = 2.5;
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylimit2, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    set(gcf,'position',[0,0, 1800,900])
+    % set(gcf,'position',[0,0, 1800,900])
     %legend([p1], saccade.label(5));
     xlim(xlimtoplot);
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
-    fontsize(ft_size,"points");
+    % fontsize(ft_size,"points");
 
     % subplot(1,2,2); hold on;
     % plot(saccade.time, squeeze(d3(:,5,:)));
@@ -225,20 +175,20 @@ if plotGAs
     cfg.colormap = colour_map;
     % per condition
     figure;
-    % for chan = 1:5
-    %     cfg.channel = chan;
-    %     subplot(2,3,chan); ft_singleplotTFR(cfg, saccadesize);
-    % end
-    cfg.channel = 5;
+    for chan = 1:4
+        cfg.channel = chan;
+        subplot(2,2,chan); ft_singleplotTFR(cfg, saccadesize);
+    end
+    cfg.channel = 4;
     ft_singleplotTFR(cfg, saccadesize);
     ylabel('Saccade size (dva)')
     xlabel('Time (ms)')
-    set(gcf,'position',[0,0, 1000, 1000])
-    fontsize(35,"points");
+    % set(gcf,'position',[0,0, 1000, 1000])
+    % fontsize(35,"points");
     hold on
-    plot([0,0], [0, 7], '--', 'LineWidth',3, 'Color', [0.6, 0.6, 0.6]);
+    % plot([0,0], [0, 7], '--', 'LineWidth',3, 'Color', [0.6, 0.6, 0.6]);
     % plot([1500,1500], [0, 7], '--', 'LineWidth',3, 'Color', [0.6, 0.6, 0.6]);
     ylim([0.2 6.8]);
-    title('Saccade towardness over time', 'FontSize', 35);
+    % title('Saccade towardness over time', 'FontSize', 35);
 
 end
