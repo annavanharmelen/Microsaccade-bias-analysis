@@ -12,7 +12,7 @@ colour_map = create_colour_map(101);
 ft_size = 26;
     
 %% parameters
-pp2do           = [1:5];
+pp2do           = [1:9];
 oneOrTwoD       = 1;        oneOrTwoD_options = {'_1D','_2D'};
 nsmooth         = 200;
 plotSinglePps   = 0;

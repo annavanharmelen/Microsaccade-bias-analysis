@@ -4,10 +4,10 @@ clc
 
 %% set parameters and loops
 display_percentage_premature = 1;
-plot_individuals = 1;
+plot_individuals = 0;
 plot_averages = 1;
 
-pp2do = [1:5]; 
+pp2do = [1:9]; 
 p = 0;
 
 
