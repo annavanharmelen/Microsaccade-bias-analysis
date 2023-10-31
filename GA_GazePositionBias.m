@@ -65,7 +65,7 @@ if plotSinglePps
         subplot(5,5,sp); hold on;
         plot(gaze.time, squeeze(d3(sp,:,:)));
         plot(xlim, [0,0], '--k');
-        xlim(xlimtoplot); ylim([-5 5]);
+        xlim(xlimtoplot); ylim([-.2 .2]);
         title(pp2do(sp));
     end
     legend(gaze.label);
@@ -90,7 +90,7 @@ if plotGAs
         subplot(2,3,sp); hold on; title(gaze.label(sp));
         p1 = frevede_errorbarplot(gaze.time, squeeze(d1(:,sp,:)), [1,0,0], 'se');
         p2 = frevede_errorbarplot(gaze.time, squeeze(d2(:,sp,:)), [0,0,1], 'se');
-        xlim(xlimtoplot); ylim([-10 10]);
+        xlim(xlimtoplot); ylim([-.2 .2]);
     end
     legend([p1, p2], {'R','L'});
     
@@ -100,13 +100,13 @@ if plotGAs
         subplot(2,3,sp); hold on; title(gaze.label(sp));
         frevede_errorbarplot(gaze.time, squeeze(d3(:,sp,:)), [0,0,0], 'both');
         plot(xlim, [0,0], '--k');
-        xlim(xlimtoplot); ylim([-10 10]);
+        xlim(xlimtoplot); ylim([-.2 .2]);
     end
     legend({'toward'});
     
 %% towardness overlay of all conditions
     figure; hold on;
-    ylimit = [-10, 10];
+    ylimit = [-.2 .2];
     plot([0,0], [ylimit], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     % plot([1500,1500], [-4, 10], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     p1 = frevede_errorbarplot(gaze.time, squeeze(d3(:,2,:)), colours(1,:), 'se');
