@@ -1,11 +1,11 @@
 %% Step3-- gaze-shift calculation
 
-%% start clean
+%% start clea
 clear; clc; close all;
 
-%% parameters
-oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
-plotResults     = 1;
+%% parameter
+oneOrTwoD       = 2; oneOrTwoD_options = {'_1D','_2D'};
+plotResults     = 0;
 
 for pp = [12:14];
 
@@ -22,6 +22,7 @@ for pp = [12:14];
     cfg = [];
     cfg.keeptrials = 'yes';
     tl = ft_timelockanalysis(cfg, eyedata); % realign the data: from trial*time cells into trial*channel*time?
+    tl.time = tl.time * 1000;
 
     %% pixel to degree
     [dva_x, dva_y] = frevede_pixel2dva(squeeze(tl.trial(:,1,:)), squeeze(tl.trial(:,2,:)));
@@ -52,7 +53,7 @@ for pp = [12:14];
     %% get gaze shifts using our custom function
     cfg = [];
     data_input = squeeze(tl.trial);
-    time_input = tl.time*1000;
+    time_input = tl.time;
 
     if oneOrTwoD == 1
         [shiftsX, velocity, times] = PBlab_gazepos2shift_1D(cfg, data_input(:,chX,:), time_input);
@@ -70,8 +71,18 @@ for pp = [12:14];
         saccadesizes = abs(shiftsX+shiftsY*1i);
     end
     
-    shiftsL = shiftsX<0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement);
-    shiftsR = shiftsX>0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement);
+    shiftsL = double(shiftsX<0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement));
+    shiftsR = double(shiftsX>0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement));
+    
+    %% turn post-change data to NaN
+    behdata = readtable(param.log);
+    trial_length = behdata.static_duration;
+
+    for trial = 1:length(trial_length)
+        selection = times > trial_length(trial);
+        shiftsL(trial, selection) = NaN;
+        shiftsR(trial, selection) = NaN;
+    end
 
     %% get relevant contrasts out
     saccade = [];
@@ -87,8 +98,8 @@ for pp = [12:14];
             sel = invalid;
         end
 
-        saccade.toward(selection,:) =  (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
-        saccade.away(selection,:)  =   (mean(shiftsL(cueR&sel,:)) + mean(shiftsR(cueL&sel,:))) ./ 2;
+        saccade.toward(selection,:) =  (mean(shiftsL(cueL&sel,:), "omitnan") + mean(shiftsR(cueR&sel,:), "omitnan")) ./ 2;
+        saccade.away(selection,:)  =   (mean(shiftsL(cueR&sel,:), "omitnan") + mean(shiftsR(cueL&sel,:), "omitnan")) ./ 2;
     end
 
     % add towardness field
@@ -157,9 +168,16 @@ for pp = [12:14];
         cnt = cnt+1;
         shiftsL = [];
         shiftsR = [];
-        shiftsL = shiftsX<-sz+halfbin & shiftsX > -sz-halfbin; % left shifts within this range
-        shiftsR = shiftsX>sz-halfbin  & shiftsX < sz+halfbin; % right shifts within this range
-    
+        shiftsL = double(shiftsX<-sz+halfbin & shiftsX > -sz-halfbin); % left shifts within this range
+        shiftsR = double(shiftsX>sz-halfbin  & shiftsX < sz+halfbin); % right shifts within this range
+       
+        % NaN data after orientation change
+        for trial = 1:length(trial_length)
+            selection = times > trial_length(trial);
+            shiftsL(trial, selection) = NaN;
+            shiftsR(trial, selection) = NaN;
+        end
+
        for selection = [1:3] % conditions.
             if selection == 1
                 sel = ones(size(valid));
@@ -169,8 +187,8 @@ for pp = [12:14];
                 sel = invalid;
             end
 
-            saccadesize.toward(selection,cnt,:) = (mean(shiftsL(cueL&sel,:)) + mean(shiftsR(cueR&sel,:))) ./ 2;
-            saccadesize.away(selection,cnt,:) =   (mean(shiftsL(cueR&sel,:)) + mean(shiftsR(cueL&sel,:))) ./ 2;
+            saccadesize.toward(selection,cnt,:) = (mean(shiftsL(cueL&sel,:), "omitnan") + mean(shiftsR(cueR&sel,:), "omitnan")) ./ 2;
+            saccadesize.away(selection,cnt,:) =   (mean(shiftsL(cueR&sel,:), "omitnan") + mean(shiftsR(cueL&sel,:), "omitnan")) ./ 2;
         end
 
     end
