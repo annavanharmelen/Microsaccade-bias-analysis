@@ -119,7 +119,7 @@ if plotGAs
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     legend([p1,p2,p3], gaze.label(2:4), 'EdgeColor', 'w', 'Location', 'northeast');
     xlim(xlimtoplot);
-    ylabel('Gaze towardness (px)');
+    ylabel('Gaze towardness (DEGREE)');
     xlabel('Time (ms)');
     set(gcf,'position',[0,0, 1800,900])
     fontsize(ft_size,"points");
@@ -133,7 +133,7 @@ if plotGAs
     plot([0,0], ylimit, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     % legend(p1, gaze.label(5), 'EdgeColor', 'w', 'Location', 'northeast');
     xlim(xlimtoplot);
-    ylabel('Gaze towardness (px)');
+    ylabel('Gaze towardness (DEGREES)');
     xlabel('Time (ms)');
     set(gcf,'position',[0,0, 1800,900])
     fontsize(ft_size,"points");
