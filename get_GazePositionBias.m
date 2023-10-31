@@ -4,12 +4,12 @@
 clear; clc; close all;
 
 %% parameters
-for pp = [1:9];
+for pp = [1:14];
 
 baselineCorrect = 0; 
-removeTrials    = 0; % remove trials where gaze deviation larger than value specified below. Only sensible after baseline correction!
-max_x_pos       = 50; % remove trials with x_position bigger than 50 pixels (~1degree)???
-plotResults     = 1;
+removeTrials    = 1; % remove trials where gaze deviation larger than value specified below. Only sensible after baseline correction!
+max_eye_pos     = 2; % remove trials with x_position bigger than 2 degrees visual angle
+plotResults     = 0;
 
 %% load epoched data of this participant data
 param = getSubjParam(pp);
@@ -26,13 +26,24 @@ eyedata = ft_selectdata(cfg, eyedata); % select x & y channels
 cfg = [];
 cfg.keeptrials = 'yes';
 tl = ft_timelockanalysis(cfg, eyedata); % realign the data: from trial*time cells into trial*channel*time?
+tl.time = tl.time * 1000;
 
 % dirty hack to get proxy for blink rate
 tl.blink = squeeze(isnan(tl.trial(:,1,:))*100); % 0 where not nan, 1 where nan (putative blink, or eye close etc.)... *100 to get to percentage of trials where blink at that time
 
+%% turn post-change data to NaN
+behdata = readtable(param.log);
+trial_length = behdata.static_duration;
+
+for trial = 1:length(trial_length)
+    selection = tl.time > trial_length(trial);
+    tl.trial(trial, :, selection) = NaN;
+    tl.blink(trial, selection) = NaN;
+end
+
 %% baseline correct?
 if baselineCorrect
-    tsel = tl.time >= -.25 & tl.time <= 0; 
+    tsel = tl.time >= -250 & tl.time <= 0; 
     bl = squeeze(mean(tl.trial(:,:,tsel),3));
     for t = 1:length(tl.time);
         tl.trial(:,:,t) = ((tl.trial(:,:,t) - bl));
@@ -55,21 +66,26 @@ title('all trials - full time range');
 end
 
 if removeTrials
-    tsel = tl.time>= 0 & tl.time <=1.5; % only check within this time range of interest
+    tsel = tl.time>= 0 & tl.time <=3200; % only check within this time range of interest
     
     figure;
     subplot(1,2,1);
     plot(tl.time(tsel), squeeze(tl.trial(:,chX,tsel)));
     title('before');
+    
     for trl = 1:size(tl.trial,1)
-        oktrial(trl) = sum(abs(tl.trial(trl,chX,tsel)) > max_x_pos)==0; % after baselining, no more deviation than XXX pixels... which is about 1 degree
+        % oktrial(trl) = sum(abs(tl.trial(trl,chX,tsel)) > max_x_pos)==0; % after baselining, no more deviation than 2 degrees
+        oktrial(trl) = sum(sqrt(abs(tl.trial(trl,chX,tsel)).^2 + abs(tl.trial(trl,chY,tsel)).^2  ) > max_eye_pos) ==0;
     end
     tl.trial = tl.trial(oktrial,:,:);
     tl.trialinfo = tl.trialinfo(oktrial,:);
 
     subplot(1,2,2);
-    plot(tl.time(tsel), squeeze(tl.trial(:,chX,tsel))); title('after');
+    plot(tl.time(tsel), squeeze(tl.trial(:,chX,tsel)));
+    title('after');
     proportionOK(pp) = mean(oktrial)*100;
+    fprintf('%s has %.2f%% OK trials\n\n', param.subjName, mean(oktrial)*100)
+
 end
 
 %% selection vectors for conditions -- this is where it starts to become interesting!
@@ -88,7 +104,7 @@ invalid = ismember(tl.trialinfo(:,1), [21,23,25,27]);
 
 %% get relevant contrasts out
 gaze = [];
-gaze.time = tl.time * 1000;
+gaze.time = tl.time;
 gaze.label = {'all','valid','invalid','valid-invalid'};
 
 for selection = [1:3] % conditions.
