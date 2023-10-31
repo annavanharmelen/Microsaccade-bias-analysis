@@ -7,7 +7,7 @@ clear; clc; close all;
 oneOrTwoD       = 1; oneOrTwoD_options = {'_1D','_2D'};
 plotResults     = 1;
 
-for pp = [8:9];
+for pp = [12:14];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
