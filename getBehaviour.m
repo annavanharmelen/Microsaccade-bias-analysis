@@ -91,13 +91,15 @@ for pp = pp2do
         plot(trial_lengths, reaction_time_per_soa_invalid(p,:), 'Color', bright_colours(2,:), 'LineWidth', 1.5);  
         hold off
     
-        title(['response times per SOA - pp ', num2str(pp2do(p))]); 
-        legend(labels);
+        title([num2str(pp2do(p))]); 
         ylim([600 1700]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks(trial_lengths);
-        xlabel('SOA in ms');
+        xlabel('SOA (ms)');
+        ylabel('Response time (ms)');
     end
+   % legend(labels);
+
     
     %% get accuracy as function of SOA
     for i = 1:size(trial_lengths, 2)
@@ -115,13 +117,15 @@ for pp = pp2do
         plot(trial_lengths, accuracy_per_soa_invalid(p,:), 'Color', bright_colours(2,:), 'LineWidth', 1.5);  
         hold off
     
-        title(['accuracy per SOA - pp ', num2str(pp2do(p))]); 
-        legend(labels);
+        title([num2str(pp2do(p))]); 
         ylim([0.4 1]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks(trial_lengths);
-        xlabel('SOA in ms');
+        xlabel('SOA (ms)');
+        ylabel('Accuracy');
     end
+    % legend(labels);
+
 
 end
 
