@@ -9,7 +9,7 @@ pp2do = [1:14];
 
 nsmooth         = 200;
 baselineCorrect = 0;
-removeTrials    = 0; % remove trials with more than XX pixel deviation from baseline
+removeTrials    = 1; % use data with removed trials based on gaze deviation from baseline
 plotSinglePps   = 1;
 plotGAs         = 1;
 xlimtoplot      = [-500 3200];
