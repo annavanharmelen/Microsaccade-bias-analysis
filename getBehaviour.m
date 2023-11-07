@@ -92,7 +92,7 @@ for pp = pp2do
         hold off
     
         title([num2str(pp2do(p))]); 
-        ylim([600 1700]);
+        ylim([400 1700]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks(trial_lengths);
         xlabel('SOA (ms)');
@@ -118,7 +118,7 @@ for pp = pp2do
         hold off
     
         title([num2str(pp2do(p))]); 
-        ylim([0.4 1]);
+        ylim([0.2 1]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks(trial_lengths);
         xlabel('SOA (ms)');
