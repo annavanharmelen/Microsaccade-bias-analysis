@@ -7,11 +7,11 @@ display_percentage_premature = 1;
 plot_individuals = 1;
 plot_averages = 1;
 
-pp2do = [1:14]; 
+pp2do = [1:17]; 
 p = 0;
 
 
-[bar_size, bright_colours, colours, dark_colours, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum, subplot_size] = setBehaviourParam(pp2do);
+[bar_size, bright_colours, colours, dark_colours, subplot_size, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum] = setBehaviourParam(pp2do);
 
 orientation_bins = [-85:16:-5, 5:16:85];
 trial_lengths = 500:300:3200;
