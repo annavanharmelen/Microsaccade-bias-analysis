@@ -133,11 +133,10 @@ for pp = [9];
     %% polar histogram
     % set shifts
     shifts = shiftsX+shiftsY*1i;
-    selection = abs(shifts) > 0;
-    shiftsL = shifts(cueL, :);
-    shiftsR = shifts(cueR, :);
-    selectionL = abs(shiftsL) > 0;
-    selectionR = abs(shiftsR) > 0;
+    for trial = 1:length(trial_length)
+        selection = times > trial_length(trial);
+        shifts(trial, selection) = NaN;
+    end
     
     if plotResults
         figure;
