@@ -106,7 +106,6 @@ for pp = [9];
        
     %% plot
     if plotResults
-         
         figure; 
         hold on
         plot(saccade.time, saccade.data(1,:,:), 'r');
@@ -129,7 +128,27 @@ for pp = [9];
         plot(saccade.time, saccade.data(1,:,:), 'r');
         plot(saccade.time, saccade.data(3,:,:), 'b');
         hold off
-        
+    end
+
+    %% polar histogram
+    % set shifts
+    shifts = shiftsX+shiftsY*1i;
+    selection = abs(shifts) > 0;
+    shiftsL = shifts(cueL, :);
+    shiftsR = shifts(cueR, :);
+    selectionL = abs(shiftsL) > 0;
+    selectionR = abs(shiftsR) > 0;
+    
+    if plotResults
+        figure;
+        subplot(2,2,1);
+        polarhistogram(angle(shiftsL(selectionL)),20);
+        subplot(2,2,2);
+        polarhistogram(angle(shiftsR(selectionR)),20);
+        subplot(2,2,3);
+        hist(abs(shiftsL(selectionL)));
+        subplot(2,2,4);
+        hist(abs(shiftsR(selectionR)));
     end
 
     %% also get as function of saccade size - identical as above, except with extra loop over saccade size.
