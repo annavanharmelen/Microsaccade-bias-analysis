@@ -7,7 +7,7 @@ clear; clc; close all;
 plotResults = 0;
 
 %% loop over participants
-for pp = [9];
+for pp = [17];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
@@ -138,16 +138,24 @@ for pp = [9];
         shifts(trial, selection) = NaN;
     end
     
+    saccadedirection = [];
+    saccadedirection.shiftsL = shifts(cueL, :);
+    saccadedirection.shiftsR = shifts(cueR, :);
+    saccadedirection.selectionL = abs(saccadedirection.shiftsL) > 0;
+    saccadedirection.selectionR = abs(saccadedirection.shiftsR) > 0;
+
     if plotResults
         figure;
         subplot(2,2,1);
-        polarhistogram(angle(shiftsL(selectionL)),20);
+        polarhistogram(angle(saccadedirection.shiftsL(saccadedirection.selectionL)),20);
         subplot(2,2,2);
-        polarhistogram(angle(shiftsR(selectionR)),20);
+        polarhistogram(angle(saccadedirection.shiftsR(saccadedirection.selectionR)),20);
         subplot(2,2,3);
-        hist(abs(shiftsL(selectionL)));
+        histogram(abs(saccadedirection.shiftsL(saccadedirection.selectionL)));
+        xlim([0 10]);
         subplot(2,2,4);
-        hist(abs(shiftsR(selectionR)));
+        histogram(abs(saccadedirection.shiftsR(saccadedirection.selectionR)));
+        xlim([0 10]);
     end
 
     %% also get as function of saccade size - identical as above, except with extra loop over saccade size.
@@ -221,7 +229,7 @@ for pp = [9];
     end
 
     %% save
-    save([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade','saccadesize');
+    save([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade', 'saccadedirection','saccadesize');
 
     %% close loops
 end % end pp loop
