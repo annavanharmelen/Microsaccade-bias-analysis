@@ -4,10 +4,10 @@
 clear; clc; close all;
 
 %% parameter
-plotResults = 0;
+plotResults = 1;
 
 %% loop over participants
-for pp = [17];
+for pp = [18:22];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);

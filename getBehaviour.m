@@ -7,7 +7,7 @@ display_percentage_premature = 1;
 plot_individuals = 1;
 plot_averages = 1;
 
-pp2do = [1:17]; 
+pp2do = [1:22]; 
 p = 0;
 
 
