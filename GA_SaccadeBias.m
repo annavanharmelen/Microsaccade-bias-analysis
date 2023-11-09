@@ -5,9 +5,9 @@
 clear; clc; close all;
     
 %% parameters
-pp2do           = [1:17];
+pp2do           = [1:22];
 nsmooth         = 200;
-plotSinglePps   = 1;
+plotSinglePps   = 0;
 plotGAs         = 0;
 xlimtoplot      = [-500 3200];
 
@@ -26,7 +26,7 @@ for pp = pp2do
 
     % load
     disp(['getting data from participant ', param.subjName]);
-    load([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade','saccadesize');
+    load([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     
     % smooth?
     if nsmooth > 0
@@ -42,11 +42,21 @@ for pp = pp2do
         end
     end
 
-    % put into matrix, with pp as first dimension
+    % put timecourses into matrix, with pp as first dimension
     for i = 1:size(saccadesize.data, 1)
         saccade_data(s,i,:) = saccade.data(i,:);
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
     end
+
+    % collate polar hist data
+    avg_directions(s,1) = nanmean(nanmean(saccadedirection.shiftsL(saccadedirection.selectionL)));
+    avg_directions(s,2) = nanmean(nanmean(saccadedirection.shiftsR(saccadedirection.selectionR)));
+    total_directions(s,1) = nansum(nansum(saccadedirection.shiftsL(saccadedirection.selectionL)));
+    total_directions(s,2) = nansum(nansum(saccadedirection.shiftsR(saccadedirection.selectionR)));
+    shiftsL(s,:,:) = saccadedirection.shiftsL;
+    shiftsR(s,:,:) = saccadedirection.shiftsR;
+    selectionL(s,:,:) = saccadedirection.selectionL;
+    selectionR(s,:,:) = saccadedirection.selectionR;
 end
 %% make GA for the saccadesize fieldtrip structure data, to later plot as "time-frequency map" with fieldtrip. For timecourse data, we directly plot from d structures above. 
 saccadesizes.dimord = saccadesize.dimord;
@@ -89,6 +99,41 @@ if plotSinglePps
         title(pp2do(sp));
         colormap('jet');
     end
+
+    % plot polar histograms per participant
+    bin_edges = [0 1 2 3 4 5 6];
+    figure;
+    title('Left');
+    c = 1;
+    for sp = 1:s
+        subplot(subplot_size,subplot_size*2,c);
+        polarhistogram(angle(shiftsL(sp,selectionL(sp,:,:))),20);
+        title(pp2do(sp));
+
+        subplot(subplot_size,subplot_size*2,c + 1);
+        histogram(abs(shiftsL(sp,selectionL(sp,:,:))), bin_edges);
+        xlim([0 6]);
+        ylim([0 500]);
+        title(sum(sum(selectionL(sp,:,:))));
+        c = c + 2;
+    end
+
+    figure;
+    title('Right');
+    c = 1;
+    for sp = 1:s
+        subplot(subplot_size,subplot_size*2,c);
+        polarhistogram(angle(shiftsR(sp,selectionR(sp,:,:))),20);
+        title(pp2do(sp));
+
+        subplot(subplot_size,subplot_size*2,c + 1);
+        histogram(abs(shiftsR(sp,selectionR(sp,:,:))), bin_edges);
+        xlim([0 6]);
+        ylim([0 500]);
+        title(sum(sum(selectionR(sp,:,:))));
+        c = c + 2;
+    end
+
 end
 
 %% Plot grand average data patterns of interest, with error bars
@@ -139,7 +184,7 @@ if plotGAs
     cfg.figure = 'gcf';
     cfg.zlim = 'maxabs';
     cfg.xlim = xlimtoplot;
-    cfg.colormap = colour_map;
+    cfg.colormap = 'jet';
     
     % per condition
     figure;
@@ -159,7 +204,20 @@ if plotGAs
     % title('Saccade towardness over time', 'FontSize', 35);
 
 
-    %% polar histogram
+    %% compass plots
+    figure;
+    subplot(1,2,1)
+    compass(avg_directions(:,1), 'k') 
+    title('Left cue');
+    subplot(1,2,2)
+    compass(avg_directions(:,2), 'k')
+    title('Right cue');
 
-
+    figure;
+    subplot(1,2,1)
+    compass(total_directions(:,1), 'k') 
+    title('Left cue');
+    subplot(1,2,2)
+    compass(total_directions(:,2), 'k')
+    title('Right cue');
 end
