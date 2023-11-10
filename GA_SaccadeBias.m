@@ -220,6 +220,7 @@ if plotGAs
     subplot(1,2,2)
     compass(total_directions(:,2), 'k')
     title('Right cue');
+
     %% plot aggregated polar histogram of all saccades (no weighting)
     bin_edges = [0 1 2 3 4 5 6];
 
@@ -237,4 +238,26 @@ if plotGAs
     histogram(abs(shiftsR(selectionR)), bin_edges);
     xlim([0 10]);
 
+    %% plot distribution of saccades per pp
+    saccades_per_pp = []
+    for sp = 1:s
+        saccades_per_pp(sp,1) = size(shiftsL(sp,selectionL(sp,:,:)), 2);
+        saccades_per_pp(sp,2) = size(shiftsR(sp,selectionR(sp,:,:)), 2);
+    end
+    saccades_per_pp(:,3) = saccades_per_pp(:,1) + saccades_per_pp(:,2);
+    figure;
+    hold on
+    plot(pp2do, saccades_per_pp(:,1));
+    plot(pp2do, saccades_per_pp(:,2));
+    plot(pp2do, saccades_per_pp(:,3));
+    hold off
+    legend({ 'left', 'right', 'total'});
+    xlabel('pp number');
+    ylabel('number of saccades (n)');
+
+    figure;
+    bar(saccades_per_pp(:,3));
+    xlabel('pp number');
+    ylabel('number of saccades (n)');
+    legend('total');
 end
