@@ -220,4 +220,21 @@ if plotGAs
     subplot(1,2,2)
     compass(total_directions(:,2), 'k')
     title('Right cue');
+    %% plot aggregated polar histogram of all saccades (no weighting)
+    bin_edges = [0 1 2 3 4 5 6];
+
+    figure;
+    subplot(2,2,1);
+    polarhistogram(angle(shiftsL(selectionL)),20);
+    title('left cue');
+    subplot(2,2,2);
+    polarhistogram(angle(shiftsR(selectionR)),20);
+    title('right cue');
+    subplot(2,2,3);
+    histogram(abs(shiftsL(selectionL)), bin_edges);
+    xlim([0 10]);
+    subplot(2,2,4);
+    histogram(abs(shiftsR(selectionR)), bin_edges);
+    xlim([0 10]);
+
 end
