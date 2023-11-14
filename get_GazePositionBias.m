@@ -4,18 +4,18 @@
 clear; clc; close all;
 
 %% parameters
-for pp = [15:25];
+for pp = [1:25];
 
-baselineCorrect = 0; 
-removeTrials    = 1; % remove trials where gaze deviation larger than value specified below. Only sensible after baseline correction!
-max_eye_pos     = 2; % remove trials with x_position bigger than 2 degrees visual angle
-plotResults     = 0;
+baselineCorrect     = 0; 
+removeTrials        = 1; % remove trials where gaze deviation larger than value specified below. Only sensible after baseline correction!
+max_eye_pos         = 2; % remove trials with x_position bigger than 2 degrees visual angle
+remove_prematures   = 1;
 
-%% load epoched data of this participant data
+plotResults         = 0;
+
+%% load epoched data of this participant
 param = getSubjParam(pp);
 load([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
-
-%% optional: add relevant behavioural file data 
 
 %% only keep channels of interest
 cfg = [];
@@ -74,7 +74,6 @@ if removeTrials
     title('before');
     
     for trl = 1:size(tl.trial,1)
-        % oktrial(trl) = sum(abs(tl.trial(trl,chX,tsel)) > max_x_pos)==0; % after baselining, no more deviation than 2 degrees
         oktrial(trl) = sum(sqrt(abs(tl.trial(trl,chX,tsel)).^2 + abs(tl.trial(trl,chY,tsel)).^2  ) > max_eye_pos) ==0;
     end
     tl.trial = tl.trial(oktrial,:,:);
@@ -163,10 +162,11 @@ if plotResults
 end
 
 %% save
-if baselineCorrect == 1 toadd1 = '_baselineCorrect'; else toadd1 = ''; end; % depending on this option, append to name of saved file.    
-if removeTrials == 1    toadd2 = '_removeTrials';    else toadd2 = ''; end; % depending on this option, append to name of saved file.    
+if baselineCorrect == 1     toadd1 = '_baselineCorrect';    else toadd1 = ''; end; % depending on this option, append to name of saved file.    
+if removeTrials == 1        toadd2 = '_removeTrials';       else toadd2 = ''; end; % depending on this option, append to name of saved file.    
+if remove_prematures == 1    toadd3 = '_removePremature';    else toadd3 = ''; end; % depending on this option, append to name of saved file.    
 
-save([param.path, '\saved_data\gazePositionEffects', toadd1, toadd2, '__', param.subjName], 'gaze');
+save([param.path, '\saved_data\gazePositionEffects', toadd1, toadd2, toadd3, '__', param.subjName], 'gaze');
 
 drawnow; 
 

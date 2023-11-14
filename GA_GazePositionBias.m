@@ -7,12 +7,14 @@ clear; clc; close all;
 %% parameters
 pp2do = [1:25];
 
-nsmooth         = 200;
-baselineCorrect = 0;
-removeTrials    = 1; % use data with removed trials based on gaze deviation from baseline
-plotSinglePps   = 1;
-plotGAs         = 1;
-xlimtoplot      = [-500 3200];
+nsmooth             = 200;
+baselineCorrect     = 0;
+removeTrials        = 1; % use data with removed trials based on gaze deviation from baseline
+remove_prematures   = 1;
+
+plotSinglePps       = 0;
+plotGAs             = 1;
+xlimtoplot          = [-500 3200];
 
 colours = [72, 224, 176;...
            104, 149, 238;...
@@ -33,10 +35,11 @@ for pp = pp2do;
     % load
     disp(['getting data from participant ', param.subjName]);
 
-    if baselineCorrect == 1 toadd1 = '_baselineCorrect'; else toadd1 = ''; end % depending on this option, append to name of saved file.
-    if removeTrials == 1    toadd2 = '_removeTrials';    else toadd2 = ''; end % depending on this option, append to name of saved file.
+    if baselineCorrect == 1     toadd1 = '_baselineCorrect'; else toadd1 = ''; end % depending on this option, append to name of saved file.
+    if removeTrials == 1        toadd2 = '_removeTrials';    else toadd2 = ''; end % depending on this option, append to name of saved file.
+    if remove_prematures == 1   toadd3 = '_removePremature'; else toadd3 = ''; end % depending on this option, append to name of saved file.
 
-    load([param.path, '\saved_data\gazePositionEffects', toadd1, toadd2, '__', param.subjName], 'gaze');
+    load([param.path, '\saved_data\gazePositionEffects', toadd1, toadd2, toadd3, '__', param.subjName], 'gaze');
 
     % smooth?
     if nsmooth > 0

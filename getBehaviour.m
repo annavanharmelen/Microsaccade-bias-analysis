@@ -6,13 +6,13 @@ clc
 display_percentage_premature = 1;
 plot_individuals = 1;
 plot_averages = 1;
+remove_prematures = 1;
 
-pp2do = [1:25]; 
+pp2do = [1]; 
 p = 0;
 
 
-[bar_size, bright_colours, colours, dark_colours, subplot_size, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum] = setBehaviourParam(pp2do);
-
+[bar_size, bright_colours, colours, dark_colours, subplot_size, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error] = setBehaviourParam(pp2do);
 orientation_bins = [-85:16:-5, 5:16:85];
 trial_lengths = 500:300:3200;
 
@@ -20,11 +20,11 @@ missed_trial_lengths = zeros(size(pp2do, 2), size(trial_lengths, 2));
 trial_orientations = zeros(size(pp2do, 2), (size(orientation_bins, 2) - 1));
 missed_orientations = zeros(size(pp2do, 2), (size(orientation_bins, 2) - 1));
 
-
 for pp = pp2do
     p = p+1;
     figure_nr = 1;
-    
+    figure_nr =  figure_nr+5;
+
     param = getSubjParam(pp);
     disp(['getting data from ', param.subjName]);
     
@@ -35,6 +35,13 @@ for pp = pp2do
     if display_percentage_premature
         fprintf('%s has %.2f%% premature responses\n\n', param.subjName, mean(ismember(behdata.premature_pressed, {'True'}))*100)
     end
+
+    %% remove premature trials
+    if remove_prematures
+        oktrials = ismember(behdata.premature_pressed, {'False'});
+        behdata = behdata(oktrials, :);
+    end
+
     %% basic data checks, each pp in own subplot
     if plot_individuals
         figure(figure_nr);

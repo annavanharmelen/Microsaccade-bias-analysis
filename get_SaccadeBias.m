@@ -4,10 +4,11 @@
 clear; clc; close all;
 
 %% parameter
-plotResults = 1;
+plotResults = 0;
+remove_prematures = 1;
 
 %% loop over participants
-for pp = [23:25];
+for pp = [1:25];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
@@ -23,6 +24,19 @@ for pp = [23:25];
     cfg.keeptrials = 'yes';
     tl = ft_timelockanalysis(cfg, eyedata); % realign the data: from trial*time cells into trial*channel*time?
     tl.time = tl.time * 1000;
+
+    %% remove premature trials
+    if remove_prematures
+        % get behavioural data
+        behdata = readtable(getSubjParam(pp).log);
+        
+        % select premature trials
+        oktrials = ismember(behdata.premature_pressed, {'False'});
+
+        % remove non-oktrials from eye-tracking data
+        tl.trial = tl.trial(oktrials,:,:);
+        tl.trialinfo = tl.trialinfo(oktrials,:,:);
+    end
 
     %% pixel to degree
     [dva_x, dva_y] = frevede_pixel2dva(squeeze(tl.trial(:,1,:)), squeeze(tl.trial(:,2,:)));
@@ -229,7 +243,14 @@ for pp = [23:25];
     end
 
     %% save
-    save([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade', 'saccadedirection','saccadesize');
+    % depending on this option, append to name of saved file. 
+    if remove_prematures == 1
+        toadd1 = '_removePremature';
+    else
+        toadd1 = '';
+    end    
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize');
 
     %% close loops
 end % end pp loop

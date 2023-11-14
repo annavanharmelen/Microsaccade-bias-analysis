@@ -5,11 +5,19 @@
 % clear; clc; close all;
     
 %% parameters
+remove_prematures = 1;
+
 pp2do           = [1:25];
 nsmooth         = 200;
 plotSinglePps   = 0;
 plotGAs         = 0;
 xlimtoplot      = [-500 3200];
+
+%% predefine size of some matrices
+shiftsL = NaN(size(pp2do, 2), 400, 3550);
+shiftsR = NaN(size(pp2do, 2), 400, 3550);
+selectionL = zeros(size(pp2do, 2), 400, 3550);
+selectionR = zeros(size(pp2do, 2), 400, 3550);
 
 %% set visual parameters
 [bar_size, bright_colours, colours, dark_colours, subplot_size] = setBehaviourParam(pp2do);
@@ -26,7 +34,10 @@ for pp = pp2do
 
     % load
     disp(['getting data from participant ', param.subjName]);
-    load([param.path, '\saved_data\saccadeEffects_4D__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
+   
+    if remove_prematures == 1   toadd1 = '_removePremature'; else toadd1 = ''; end % depending on this option, append to name of saved file.
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     
     % smooth?
     if nsmooth > 0
@@ -48,14 +59,21 @@ for pp = pp2do
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
     end
 
-    % collate polar hist data
+    % take average of polar hist data
     avg_directions(s,1) = mean(saccadedirection.shiftsL((imag(saccadedirection.shiftsL) < 0) & saccadedirection.selectionL), "all", "omitnan");
     avg_directions(s,2) = mean(saccadedirection.shiftsR((imag(saccadedirection.shiftsR) < 0) & saccadedirection.selectionR), "all", "omitnan");
-    shiftsL(s,:,:) = saccadedirection.shiftsL;
-    shiftsR(s,:,:) = saccadedirection.shiftsR;
-    selectionL(s,:,:) = saccadedirection.selectionL;
-    selectionR(s,:,:) = saccadedirection.selectionR;
+    
+    % collate polar hist data
+    n_trialsL = size(saccadedirection.shiftsL, 1);
+    n_trialsR = size(saccadedirection.shiftsR, 1);
+    shiftsL(s, 1:n_trialsL, :) = saccadedirection.shiftsL;
+    shiftsR(s, 1:n_trialsR, :) = saccadedirection.shiftsR;
+    selectionL(s, 1:n_trialsL, :) = saccadedirection.selectionL;
+    selectionR(s, 1:n_trialsR, :) = saccadedirection.selectionR;
 end
+
+selectionL = logical(selectionL);
+selectionR = logical(selectionR);
 %% make GA for the saccadesize fieldtrip structure data, to later plot as "time-frequency map" with fieldtrip. For timecourse data, we directly plot from d structures above. 
 saccadesizes.dimord = saccadesize.dimord;
 saccadesizes.label = saccadesize.label;
