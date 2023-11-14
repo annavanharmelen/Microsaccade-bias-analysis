@@ -4,7 +4,7 @@
 clear; clc; close all;
 
 %% parameters
-for pp = [1:14];
+for pp = [15:25];
 
 baselineCorrect = 0; 
 removeTrials    = 1; % remove trials where gaze deviation larger than value specified below. Only sensible after baseline correction!

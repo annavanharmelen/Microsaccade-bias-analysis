@@ -7,7 +7,7 @@ clear; clc; close all;
 plotResults = 1;
 
 %% loop over participants
-for pp = [18:22];
+for pp = [23:25];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
