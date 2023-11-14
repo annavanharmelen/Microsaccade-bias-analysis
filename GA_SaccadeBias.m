@@ -2,7 +2,7 @@
 %% Step3b--grand average plots of gaze-shift (saccade) results
 
 %% start clean
-% clear; clc; close all;
+clear; clc; close all;
     
 %% parameters
 remove_prematures = 1;
@@ -248,7 +248,7 @@ if plotGAs
     xlim([0 10]);
 
     %% polar histogram of all saccades (all participants weighted as 1)
-    figure;
+    fig = figure;
     for sp = 1:s
         p = polarhistogram(angle(shiftsL(sp, selectionL(sp,:,:))),20);
         L_counts(sp,:) = p.Values;
@@ -256,7 +256,8 @@ if plotGAs
         R_counts(sp,:) = p.Values;
     end
     polar_bin_edges = p.BinEdges;
-
+    close(fig)
+    
     L_density = L_counts./sum(L_counts, 2);
     R_density = R_counts./sum(R_counts, 2);
     
@@ -270,25 +271,29 @@ if plotGAs
     title('right cue');
 
     %% plot distribution of saccades per pp
-    saccades_per_pp = []
+    saccades_per_pp = [];
     for sp = 1:s
         saccades_per_pp(sp,1) = size(shiftsL(sp,selectionL(sp,:,:)), 2);
         saccades_per_pp(sp,2) = size(shiftsR(sp,selectionR(sp,:,:)), 2);
     end
     saccades_per_pp(:,3) = saccades_per_pp(:,1) + saccades_per_pp(:,2);
+    [B, I] = sort(saccades_per_pp(:,3), "descend");
+    
     figure;
     hold on
-    plot(pp2do, saccades_per_pp(:,1));
-    plot(pp2do, saccades_per_pp(:,2));
-    plot(pp2do, saccades_per_pp(:,3));
+    bar(saccades_per_pp(I,1:2), 'stacked');
     hold off
-    legend({ 'left', 'right', 'total'});
+    legend({ 'left', 'right'});
     xlabel('pp number');
+    xticks(1:size(pp2do, 2));
+    xticklabels(I);
     ylabel('number of saccades (n)');
 
     figure;
-    bar(saccades_per_pp(:,3));
+    bar(B);
     xlabel('pp number');
+    xticks(1:size(pp2do, 2));
+    xticklabels(I);
     ylabel('number of saccades (n)');
     legend('total');
 
