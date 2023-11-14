@@ -2,10 +2,10 @@
 %% Step3b--grand average plots of gaze-shift (saccade) results
 
 %% start clean
-clear; clc; close all;
+% clear; clc; close all;
     
 %% parameters
-pp2do           = [1:22];
+pp2do           = [1:25];
 nsmooth         = 200;
 plotSinglePps   = 0;
 plotGAs         = 0;
@@ -49,10 +49,8 @@ for pp = pp2do
     end
 
     % collate polar hist data
-    avg_directions(s,1) = nanmean(nanmean(saccadedirection.shiftsL(saccadedirection.selectionL)));
-    avg_directions(s,2) = nanmean(nanmean(saccadedirection.shiftsR(saccadedirection.selectionR)));
-    total_directions(s,1) = nansum(nansum(saccadedirection.shiftsL(saccadedirection.selectionL)));
-    total_directions(s,2) = nansum(nansum(saccadedirection.shiftsR(saccadedirection.selectionR)));
+    avg_directions(s,1) = mean(saccadedirection.shiftsL((imag(saccadedirection.shiftsL) < 0) & saccadedirection.selectionL), "all", "omitnan");
+    avg_directions(s,2) = mean(saccadedirection.shiftsR((imag(saccadedirection.shiftsR) < 0) & saccadedirection.selectionR), "all", "omitnan");
     shiftsL(s,:,:) = saccadedirection.shiftsL;
     shiftsR(s,:,:) = saccadedirection.shiftsR;
     selectionL(s,:,:) = saccadedirection.selectionL;
@@ -213,30 +211,45 @@ if plotGAs
     compass(avg_directions(:,2), 'k')
     title('Right cue');
 
-    figure;
-    subplot(1,2,1)
-    compass(total_directions(:,1), 'k') 
-    title('Left cue');
-    subplot(1,2,2)
-    compass(total_directions(:,2), 'k')
-    title('Right cue');
-
     %% plot aggregated polar histogram of all saccades (no weighting)
     bin_edges = [0 1 2 3 4 5 6];
+    max_saccade_size = 2; 
 
     figure;
     subplot(2,2,1);
-    polarhistogram(angle(shiftsL(selectionL)),20);
+    polarhistogram(angle(shiftsL((abs(shiftsL) < max_saccade_size) & selectionL)),20);
     title('left cue');
     subplot(2,2,2);
-    polarhistogram(angle(shiftsR(selectionR)),20);
+    polarhistogram(angle(shiftsR((abs(shiftsR) < max_saccade_size) & selectionR)),20);
     title('right cue');
     subplot(2,2,3);
-    histogram(abs(shiftsL(selectionL)), bin_edges);
+    histogram(abs(shiftsL((abs(shiftsL) < max_saccade_size) & selectionL)), bin_edges);
     xlim([0 10]);
     subplot(2,2,4);
-    histogram(abs(shiftsR(selectionR)), bin_edges);
+    histogram(abs(shiftsR((abs(shiftsR) < max_saccade_size) & selectionR)), bin_edges);
     xlim([0 10]);
+
+    %% polar histogram of all saccades (all participants weighted as 1)
+    figure;
+    for sp = 1:s
+        p = polarhistogram(angle(shiftsL(sp, selectionL(sp,:,:))),20);
+        L_counts(sp,:) = p.Values;
+        p = polarhistogram(angle(shiftsR(sp, selectionR(sp,:,:))),20);
+        R_counts(sp,:) = p.Values;
+    end
+    polar_bin_edges = p.BinEdges;
+
+    L_density = L_counts./sum(L_counts, 2);
+    R_density = R_counts./sum(R_counts, 2);
+    
+    figure;
+    subplot(2,2,1);
+    polarhistogram('BinEdges', polar_bin_edges, 'BinCounts', mean(L_density)*100)
+    title('left cue');
+
+    subplot(2,2,2);
+    polarhistogram('BinEdges', polar_bin_edges, 'BinCounts', mean(R_density)*100)
+    title('right cue');
 
     %% plot distribution of saccades per pp
     saccades_per_pp = []
@@ -260,4 +273,5 @@ if plotGAs
     xlabel('pp number');
     ylabel('number of saccades (n)');
     legend('total');
+
 end
