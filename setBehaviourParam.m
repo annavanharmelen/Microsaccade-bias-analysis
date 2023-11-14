@@ -21,7 +21,6 @@ decisiontime_std = zeros(size(pp2do, 2), size(labels, 2) + 1);
 error = zeros(size(pp2do, 2), size(labels, 2) + 1);
 overall_dt = zeros(size(pp2do));
 overall_error = zeros(size(pp2do));
-ppnum = zeros(size(pp2do));
 
 subplot_size = ceil(sqrt(size(pp2do, 2)));
 end
