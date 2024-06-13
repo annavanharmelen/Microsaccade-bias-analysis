@@ -1,24 +1,37 @@
-function [bar_size, bright_colours, colours, dark_colours, subplot_size, labels, percentageok, decisiontime, decisiontime_std, error, overall_dt, overall_error, ppnum] = setBehaviourParam(pp2do)
+function [bar_size, bright_colours, colours, light_colours, SOA_colours, dark_colours, subplot_size, labels, percentageok, overall_dt, overall_error, ppnum] = setBehaviourParam(pp2do)
 %SETBEHAVIOURPARAM sets the parameters for analysing the behavioural data.
-bar_size = 0.8;
+bar_size = 0.7;
 
 bright_colours=[84, 206, 116;...
-                156, 138, 238];
+                156, 138, 238;...
+                237, 107, 170;...
+                115, 160, 255];
 bright_colours = bright_colours/255;
 
 colours = [120, 186, 137;...
-           161, 153, 196];
+           165,156,207;...
+           214, 139, 175;...
+           147, 182, 219];
 colours = colours/255;
 
+light_colours = [83,129,95;...
+           112,104,149;...
+           237, 199, 217;...
+           192, 214, 237];
+light_colours = light_colours/255;
+
+SOA_colours = [170,231,186;...
+        206,197,247];
+SOA_colours = SOA_colours/255;
+
 dark_colours = [46, 71, 52;...
-                63, 55, 102];
+                63, 55, 102;...
+                74, 46, 59;...
+                42, 61, 82];
 dark_colours = dark_colours/255;
 
 labels = {'valid','invalid'};
 percentageok = zeros(size(pp2do));
-decisiontime = zeros(size(pp2do, 2), size(labels, 2) + 1);
-decisiontime_std = zeros(size(pp2do, 2), size(labels, 2) + 1);
-error = zeros(size(pp2do, 2), size(labels, 2) + 1);
 overall_dt = zeros(size(pp2do));
 overall_error = zeros(size(pp2do));
 
