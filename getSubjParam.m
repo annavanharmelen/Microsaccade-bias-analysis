@@ -5,7 +5,7 @@ function param = getSubjParam(pp)
 %% set path and pp-specific file locations
 unique_numbers = [99, 26, 32, 19, 62, 28, 55, 15, 89, 31, 22, 44, 59, 45, 27, 30, 10, 81, 88, 16, 49, 87, 58, 90, 37]; %needs to be in the right order
 
-param.path = 'C:\Users\annav\Documents\Jottacloud\Neuroscience PhD\Experiments\Microsaccade bias experiments\Data\';
+param.path = '\\labsdfs.labs.vu.nl\labsdfs\FGB-ETP-CogPsy-ProactiveBrainLab\core_lab_members\Anna\Data\m1 - microsaccade bias shift vs. sustain';
 
 if pp < 10
     param.subjName = sprintf('pp0%d', pp);
