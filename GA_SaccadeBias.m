@@ -7,8 +7,10 @@ clear; clc; close all;
 %% parameters
 remove_prematures = 1;
 
-pp2do           = [1:25];
-nsmooth         = 200;
+pp2do           = [2:25];
+% pp2do = [2     4     8     9    10    14    15    18    19    20    23    24];
+% pp2do = [3, 5, 6, 7, 11, 12, 13, 16, 17, 21, 22, 25];
+nsmooth         = 500;
 plotSinglePps   = 0;
 plotGAs         = 0;
 xlimtoplot      = [-500 3200];
@@ -18,6 +20,8 @@ shiftsL = NaN(size(pp2do, 2), 400, 3550);
 shiftsR = NaN(size(pp2do, 2), 400, 3550);
 selectionL = zeros(size(pp2do, 2), 400, 3550);
 selectionR = zeros(size(pp2do, 2), 400, 3550);
+avg_saccade_effect = zeros(size(pp2do, 2), 3);
+avg_saccade_axis_effect = zeros(size(pp2do, 2), 2);
 
 %% set visual parameters
 [bar_size, bright_colours, colours, dark_colours, subplot_size] = setBehaviourParam(pp2do);
@@ -37,8 +41,15 @@ for pp = pp2do
    
     if remove_prematures == 1   toadd1 = '_removePremature'; else toadd1 = ''; end % depending on this option, append to name of saved file.
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
+    load([param.path, '\saved_data\saccadeEffects_4D_onlydowneffect', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     
+    % save averages (saccade effect (capture cue effect and probe cue reaction)
+    avg_saccade_effect(s, 1) = mean(saccade.data(7,saccade.time>=200 & saccade.time<=600));
+    avg_saccade_effect(s, 2) = mean(saccade.data(7,saccade.time>=1000 & saccade.time<=3000));
+    avg_saccade_effect(s, 3) = mean(saccade.data(7,:));
+
+    avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
+    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000) - saccade.data(6,saccade.time>=1000 & saccade.time<=3000));
     % smooth?
     if nsmooth > 0
         for i = 1:size(saccade.data,1)
@@ -109,7 +120,7 @@ if plotSinglePps
         cfg.xlim = xlimtoplot;
         subplot(subplot_size, subplot_size,sp);
         hold on;
-        cfg.channel = 1;
+        cfg.channel = 7;
         saccadesize.effect_individual = squeeze(saccadesizes.data(sp,:,:,:));
         ft_singleplotTFR(cfg, saccadesize);
         title(pp2do(sp));
@@ -157,7 +168,7 @@ if plotGAs
     % plot all four possible directions separately
     figure; 
     hold on
-    p1 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,1,:)), 'r', 'se');
+    p1 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,1,:)), colours(1,:), 'se');
     p2 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,2,:)), [1, 0.5, 0.5], 'se');
     p3 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,3,:)), 'b', 'se');
     p4 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,4,:)), [0.5, 0.5, 1], 'se');
@@ -169,7 +180,7 @@ if plotGAs
     % plot both axes of directions separately
     figure;
     hold on
-    p5 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), 'r', 'se');
+    p5 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), colours(1,:), 'se');
     p6 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,6,:)), 'b', 'se');
     legend([p5, p6], {'target-axis', 'nontarget-axis'});
     ylabel('Rate (Hz)');
@@ -179,19 +190,34 @@ if plotGAs
     % plot the effect
     figure;
     hold on
-    p7 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,7,:)), 'k', 'se');
-    legend([p7], {'effect'});
+    p7 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,7,:)), bright_colours(3,:), 'se');
+    p7.LineWidth = 2.5;
+    fontsize(23, 'points')
+    xlim([-500, 3100]);
+    plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    % legend([p7], 'effect', 'EdgeColor', 'w', 'Fontsize', 28);
+    ylabel('Rate (Hz)', 'Fontsize', 28);
+    xlabel('Time (ms)', 'Fontsize', 28);
+    set(gcf,'position',[0,0, 1800,900])
     xlabel('Time (ms)');
     hold off
     
     % plot only saccades towards the stimulus or the distractor
     figure;
     hold on
-    p8 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,1,:)), 'r', 'se');
-    p9 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,3,:)), 'b', 'se');
-    legend([p8, p9], {'target', 'nontarget'});
-    ylabel('Rate (Hz)');
-    xlabel('Time (ms)');
+    p8 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,1,:)), bright_colours(1,:), 'se');
+    p9 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,3,:)), bright_colours(2,:), 'se');
+    p8.LineWidth = 2.5;
+    p9.LineWidth = 2.5;
+    fontsize(23, 'points')
+    xlim([-500, 3100]);
+    % plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    legend([p8, p9], {'target', 'nontarget'}, 'EdgeColor', 'w', 'Fontsize', 28);
+    ylabel('Rate (Hz)', 'Fontsize', 28);
+    xlabel('Time (ms)', 'Fontsize', 28);
+    set(gcf,'position',[0,0, 1800,900])
     hold off
     
     %% as function of saccade size
@@ -199,7 +225,7 @@ if plotGAs
     cfg.parameter = 'avg_data';
     cfg.figure = 'gcf';
     cfg.zlim = 'maxabs';
-    cfg.xlim = xlimtoplot;
+    cfg.xlim = xlimtoplot;  
     cfg.colormap = 'jet';
     
     % per condition
@@ -219,19 +245,99 @@ if plotGAs
     end
     % title('Saccade towardness over time', 'FontSize', 35);
 
+    %% just effect as function of saccade size
+    cfg = [];
+    cfg.parameter = 'avg_data';
+    cfg.figure = 'gcf';
+    cfg.zlim = 'maxabs';
+    cfg.xlim = xlimtoplot;  
+    cfg.colormap = brewermap(1000, 'PRGn');
+    
+    % per condition
+    figure;
+    cfg.channel = 7;
+    ft_singleplotTFR(cfg, saccadesizes);
+    ylabel('Saccade size (dva)', 'FontSize', 35, 'Position', [-880 2.8750 1]);
+    xlabel('Time (ms)', 'FontSize', 35);
+    zticks([]);
+    hold on
+    set(gcf,'position',[0,0, 1800, 750])
+    plot([0,0], [0, 7], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([-500 2300], [5, 5], '--', 'LineWidth',2, 'Color', [0,68,27]/255);
+    plot([-500 2300], [3.73, 3.73], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([-500 1400], [1, 1], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    xlim([-450, 3050]);
+    ylim([0.25 5.5]);
+    title('', 'FontSize', 39);
+    fontsize(39,"points");
+    text(2420, 5.025, 'Centre', 'FontSize', 34, 'Color', [0,68,27]/255);
+    text(2420, 3.755, 'Border', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
+    text(1520, 1, 'Microsaccade range', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
 
-    %% compass plots
+
+    %% compass plots on cartesian axis
     figure;
     subplot(1,2,1)
-    compass(avg_directions(:,1), 'k') 
-    title('Left cue');
+    c1 = compass(avg_directions(:,1));
+    for i = 1:size(c1, 1)
+        c1(i).LineWidth = 2.5;
+        c1(i).Color = 'k';
+    end
+    
     subplot(1,2,2)
-    compass(avg_directions(:,2), 'k')
-    title('Right cue');
+    c2 = compass(avg_directions(:,2));
+    for i = 1:size(c2, 1)
+        c2(i).LineWidth = 2.5;
+        c2(i).Color = 'k';
+    end
+    fontsize(25, 'points')
+    title('Right cue', 'FontSize', 35);
+    yticks([]);
+    set(gcf,'position',[0,0, 1600, 1000])
+    
+    subplot(1,2,1)
+    title('Left cue', 'FontSize', 35);
 
+    %% compass plots on polar axis
+    arrow_width_factor = (40/360);
+    arrow_height = 0.09;
+    x = 1.5;
+    
+    figure;
+    subplot(1,2,1)
+    for sp = 1:s
+        arrow_width = arrow_width_factor / abs(avg_directions(sp,1));
+        
+        polarplot([angle(avg_directions(sp,1)), angle(avg_directions(sp,1))], [0, abs(avg_directions(sp,1)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
+        hold on
+        polarplot([angle(avg_directions(sp,1)) - arrow_width, angle(avg_directions(sp,1)) + arrow_width], [abs(avg_directions(sp,1)) - arrow_height, abs(avg_directions(sp,1)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
+        polarplot([angle(avg_directions(sp,1)) - arrow_width, angle(avg_directions(sp,1))], [abs(avg_directions(sp,1)) - arrow_height, abs(avg_directions(sp,1))], '-', 'Color', 'k', 'LineWidth', x);
+        polarplot([angle(avg_directions(sp,1)), angle(avg_directions(sp,1)) + arrow_width], [abs(avg_directions(sp,1)), abs(avg_directions(sp,1)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x); 
+    end
+    rticks([1]);
+    thetaticks([0:45:360]);
+
+    subplot(1,2,2)
+    for sp = 1:s
+        arrow_width = arrow_width_factor / abs(avg_directions(sp,2));
+        
+        polarplot([angle(avg_directions(sp,2)), angle(avg_directions(sp,2))], [0, abs(avg_directions(sp,2)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
+        hold on
+        polarplot([angle(avg_directions(sp,2)) - arrow_width, angle(avg_directions(sp,2)) + arrow_width], [abs(avg_directions(sp,2)) - arrow_height, abs(avg_directions(sp,2)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
+        polarplot([angle(avg_directions(sp,2)) - arrow_width, angle(avg_directions(sp,2))], [abs(avg_directions(sp,2)) - arrow_height, abs(avg_directions(sp,2))], '-', 'Color', 'k', 'LineWidth', x);
+        polarplot([angle(avg_directions(sp,2)), angle(avg_directions(sp,2)) + arrow_width], [abs(avg_directions(sp,2)), abs(avg_directions(sp,2)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
+    end
+    rticks([1]);
+    thetaticks([0:45:360]);
+    fontsize(30, 'points')
+    % title('Right cue', 'FontSize', 35);
+    
+    subplot(1,2,1)
+    % title('Left cue', 'FontSize', 35);
+    set(gcf,'position',[0,0, 1600, 1000])
     %% plot aggregated polar histogram of all saccades (no weighting)
     bin_edges = [0 1 2 3 4 5 6];
-    max_saccade_size = 2; 
+    max_saccade_size = 1; 
 
     figure;
     subplot(2,2,1);
@@ -239,7 +345,7 @@ if plotGAs
     title('left cue');
     subplot(2,2,2);
     polarhistogram(angle(shiftsR((abs(shiftsR) < max_saccade_size) & selectionR)),20);
-    title('right cue');
+    % title('right cue');
     subplot(2,2,3);
     histogram(abs(shiftsL((abs(shiftsL) < max_saccade_size) & selectionL)), bin_edges);
     xlim([0 10]);
@@ -261,14 +367,33 @@ if plotGAs
     L_density = L_counts./sum(L_counts, 2);
     R_density = R_counts./sum(R_counts, 2);
     
-    figure;
-    subplot(2,2,1);
-    polarhistogram('BinEdges', polar_bin_edges, 'BinCounts', mean(L_density)*100)
-    title('left cue');
+    L_values = mean(L_density)*100;
+    R_values = mean(R_density)*100;
 
-    subplot(2,2,2);
-    polarhistogram('BinEdges', polar_bin_edges, 'BinCounts', mean(R_density)*100)
-    title('right cue');
+    figure;
+    subplot(1,2,1);
+    polarhistogram('BinEdges', polar_bin_edges(10:21), 'BinCounts', L_values(10:20), 'FaceColor', [0.6, 0.6, 0.6], 'FaceAlpha', 0.45, 'EdgeColor', [1,1,1]);
+    hold on
+    polarhistogram('BinEdges', polar_bin_edges(1:11), 'BinCounts', L_values(1:10), 'FaceColor', [0.6, 0.6, 0.6], 'FaceAlpha', 0.9, 'EdgeColor', [1,1,1]);
+    rlim([0 10]);
+    rticks([5 10]);
+    thetaticks([0:45:360]);
+    hold off
+
+    subplot(1,2,2);
+    polarhistogram('BinEdges', polar_bin_edges(10:21), 'BinCounts', R_values(10:20), 'FaceColor',[0.6,0.6,0.6], 'FaceAlpha', 0.45, 'EdgeColor', [1,1,1]);
+    hold on
+    polarhistogram('BinEdges', polar_bin_edges(1:11), 'BinCounts', R_values(1:10), 'FaceColor', [0.6, 0.6, 0.6], 'FaceAlpha', 0.9, 'EdgeColor', [1,1,1]);
+    rlim([0 10]);
+    rticks([5 10]);
+    thetaticks([0:45:360]);
+    hold off
+    fontsize(30, 'points')
+    % title('Right cue', 'FontSize', 35);
+    set(gcf,'position',[0,0, 1600, 1000])
+    
+    subplot(1,2,1)
+    % title('Left cue', 'FontSize', 35);
 
     %% plot distribution of saccades per pp
     saccades_per_pp = [];
@@ -297,4 +422,79 @@ if plotGAs
     ylabel('number of saccades (n)');
     legend('total');
 
+    %% plot bar chart of different timeframes
+    figure;
+    hold on
+    b1 = bar([1], [mean(avg_saccade_effect(:,1))], bar_size, FaceColor=colours(3,:), EdgeColor=colours(3,:));
+    b2 = bar([2], [mean(avg_saccade_effect(:,2))], bar_size, FaceColor=colours(4,:), EdgeColor=colours(4,:));
+    errorbar([1], [mean(avg_saccade_effect(:,1))], [std(avg_saccade_effect(:,1)) ./ sqrt(size(pp2do, 2))], 'LineWidth', 3, 'Color', dark_colours(3,:));
+    errorbar([2], [mean(avg_saccade_effect(:,2))], [std(avg_saccade_effect(:,2)) ./ sqrt(size(pp2do, 2))], 'LineWidth', 3, 'Color', dark_colours(4,:));
+    plot([1,2], [avg_saccade_effect(:,1:2)]', 'Color', [0, 0, 0, 0.25], 'LineWidth', 1);
+
+    % title('Saccade towards rate')
+    % legend(labels, 'Location', 'southeast');
+    ylim([-0.03 0.26]);
+    ylabel('Saccade bias (ΔHz)');
+    yticks([0 0.1 0.2]);
+    xlim([0.3 2.7]);
+    xticks([1,2]);
+    xticklabels({'Shift', 'Sustain'});
+    fontsize(27, "points");
+    
+    set(gcf,'position',[0,0, 650,1080])
+
+    %% polar histogram of separate timeframes
+    time_edges = [1000, 3000];
+    x = 4;
+    % get indices of wanted time range
+    timeidx = find(abs(saccade.time - time_edges(1)) < 0.01):find(abs(saccade.time - time_edges(2)) < 0.01);
+
+    fig = figure;
+    for sp = 1:s
+        sp_time_shiftsL = shiftsL(sp,:,timeidx);
+        sp_time_selL = selectionL(sp,:,timeidx);
+        p = polarhistogram(angle(sp_time_shiftsL(sp_time_selL)),20);
+        L_counts(sp,:) = p.Values;
+
+        sp_time_shiftsR = shiftsR(sp,:,timeidx);
+        sp_time_selR = selectionR(sp,:,timeidx);
+        p = polarhistogram(angle(sp_time_shiftsR(sp_time_selR)),20);
+        R_counts(sp,:) = p.Values;
+    end
+    polar_bin_edges = p.BinEdges;
+    close(fig)
+    
+    L_density = L_counts./sum(L_counts, 2);
+    R_density = R_counts./sum(R_counts, 2);
+    
+    L_values = mean(L_density)*100;
+    R_values = mean(R_density)*100;
+
+
+    figure;
+    subplot(1,2,1);
+    polarhistogram('BinEdges', polar_bin_edges(11:21), 'BinCounts', L_values(11:20), 'FaceColor', [0.6, 0.6, 0.6], 'FaceAlpha', 0.45, 'EdgeColor', [1,1,1]);
+    hold on
+    polarhistogram('BinEdges', polar_bin_edges(1:11), 'BinCounts', L_values(1:10), 'FaceColor', bright_colours(x,:), 'FaceAlpha', 0.7, 'EdgeColor', [1,1,1]);
+    rlim([0, 10]);
+    thetaticks([]);
+    rticks([5 10]);
+    % title('left cue');
+    
+    subplot(1,2,2);
+    polarhistogram('BinEdges', polar_bin_edges(11:21), 'BinCounts', R_values(11:20), 'FaceColor', [0.6, 0.6, 0.6], 'FaceAlpha', 0.45, 'EdgeColor', [1,1,1]);
+    hold on
+    polarhistogram('BinEdges', polar_bin_edges(1:11), 'BinCounts', R_values(1:10), 'FaceColor', bright_colours(x,:), 'FaceAlpha', 0.7, 'EdgeColor', [1,1,1]);
+    rlim([0, 10]);
+    rticks([5 10]);
+    thetaticks([]);
+    fontsize(50, 'points')
+    % title('Right cue', 'FontSize', 35);
+    % sgtitle(sprintf('%d - %d ms',time_edges(1), time_edges(2)));
+ 
+    set(gcf,'position',[0,0, 1600, 1000])
+
+    subplot(1,2,1)
+    % title('Left cue', 'FontSize', 35);
+  
 end
