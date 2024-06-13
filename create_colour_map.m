@@ -4,9 +4,11 @@ if mod(n_steps, 2) ~= 1
     error("number of steps should be an uneven number")
 end
 
-start_colour = [36, 70, 167];
+% start_colour = [36, 70, 167];
 mid_colour = [255, 255, 255];
-end_colour = [222, 66, 91];
+% end_colour = [222, 66, 91];
+start_colour = [129, 0, 0];
+end_colour = [0, 0, 143];
 
 colour_map = zeros([n_steps 3]);
 
