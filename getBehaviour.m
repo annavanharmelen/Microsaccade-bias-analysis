@@ -1,14 +1,14 @@
-% clear all
-% close all
-% clc
+clear all
+close all
+clc
 
 %% set parameters and loops
 display_percentage_premature = 1;
-plot_individuals = 0;
-plot_averages = 0;
-remove_prematures = 1;
+plot_individuals = 1;
+plot_averages = 1;
+remove_prematures = 0; %this doesn't work well yet with the automatic gaze control
 
-pp2do = [2:25];
+pp2do = [1:2];
 p = 0;
 
 
@@ -33,7 +33,7 @@ for pp = pp2do
     
     %% display percentage prematurely pressed trials
     if display_percentage_premature
-        fprintf('%s has %.2f%% premature responses\n\n', param.subjName, mean(ismember(behdata.premature_pressed, {'True'}))*100)
+        fprintf('%s has %.2f%% premature responses\n\n', param.subjName, nanmean(ismember(behdata.premature_pressed, {'True'}))*100)
     end
     
     %% remove premature trials
@@ -77,15 +77,15 @@ for pp = pp2do
     %% extract data of interest
     labels = {'valid','invalid'};
     
-    reaction_time_validity(p,1) = mean(behdata.response_time_in_ms(valid_trials));
-    reaction_time_validity(p,2) = mean(behdata.response_time_in_ms(invalid_trials));
+    reaction_time_validity(p,1) = nanmean(behdata.response_time_in_ms(valid_trials));
+    reaction_time_validity(p,2) = nanmean(behdata.response_time_in_ms(invalid_trials));
     
-    error_validity(p,1)      = mean(correct_trials(valid_trials));
-    error_validity(p,2)      = mean(correct_trials(invalid_trials));
+    error_validity(p,1)      = nanmean(correct_trials(valid_trials));
+    error_validity(p,2)      = nanmean(correct_trials(invalid_trials));
     %% get reaction time as function of SOA
     for i = 1:size(trial_lengths, 2)
-        reaction_time_per_soa_valid(p,i) = mean(behdata.response_time_in_ms(valid_trials&behdata.static_duration==trial_lengths(i)));
-        reaction_time_per_soa_invalid(p,i) = mean(behdata.response_time_in_ms(invalid_trials&behdata.static_duration==trial_lengths(i)));
+        reaction_time_per_soa_valid(p,i) = nanmean(behdata.response_time_in_ms(valid_trials&behdata.static_duration==trial_lengths(i)));
+        reaction_time_per_soa_invalid(p,i) = nanmean(behdata.response_time_in_ms(invalid_trials&behdata.static_duration==trial_lengths(i)));
     end
     
     if plot_individuals
@@ -110,8 +110,8 @@ for pp = pp2do
     
     %% get accuracy as function of SOA
     for i = 1:size(trial_lengths, 2)
-        accuracy_per_soa_valid(p,i) = mean(correct_trials(valid_trials&behdata.static_duration==trial_lengths(i)));
-        accuracy_per_soa_invalid(p,i) = mean(correct_trials(invalid_trials&behdata.static_duration==trial_lengths(i)));
+        accuracy_per_soa_valid(p,i) = nanmean(correct_trials(valid_trials&behdata.static_duration==trial_lengths(i)));
+        accuracy_per_soa_invalid(p,i) = nanmean(correct_trials(invalid_trials&behdata.static_duration==trial_lengths(i)));
     end
     
     if plot_individuals
@@ -120,7 +120,7 @@ for pp = pp2do
         subplot(subplot_size,subplot_size,p);
         
         hold on
-        plot(trial_lengths, accuracy_per_soa_valid(max(pp2do),:), 'Color', bright_colours(1,:), 'LineWidth', 1.5);
+        plot(trial_lengths, accuracy_per_soa_valid(p,:), 'Color', bright_colours(1,:), 'LineWidth', 1.5);
         plot(trial_lengths, accuracy_per_soa_invalid(p,:), 'Color', bright_colours(2,:), 'LineWidth', 1.5);
         hold off
         
@@ -144,15 +144,15 @@ if plot_averages
     % subplot(1,2,2);
     hold on
     
-    l1 = plot(trial_lengths, mean(reaction_time_per_soa_valid), 'Color', bright_colours(1,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
+    l1 = plot(trial_lengths, nanmean(reaction_time_per_soa_valid), 'Color', bright_colours(1,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
     p1 = frevede_errorbarplot(trial_lengths, reaction_time_per_soa_valid, bright_colours(1,:), 'se');
-    l2 = plot(trial_lengths, mean(reaction_time_per_soa_invalid), 'Color', bright_colours(2,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(2,:));
+    l2 = plot(trial_lengths, nanmean(reaction_time_per_soa_invalid), 'Color', bright_colours(2,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(2,:));
     p2 = frevede_errorbarplot(trial_lengths, reaction_time_per_soa_invalid, bright_colours(2,:), 'se');
     
     
     if exist('stat_r') == 1
-        invalid = mean(reaction_time_per_soa_invalid)
-        valid = mean(reaction_time_per_soa_valid)
+        invalid = nanmean(reaction_time_per_soa_invalid)
+        valid = nanmean(reaction_time_per_soa_valid)
         
         for X = trial_lengths(stat_r.mask)
             Y = find(trial_lengths == X);
@@ -168,20 +168,20 @@ if plot_averages
     xticks([500 1400 2300 3200]);
     xlim([min(trial_lengths) max(trial_lengths)]);
     fontsize(30, "points");
-    set(gcf,'position',[0,0, 700,1080])
+    % set(gcf,'position',[0,0, 700,1080])
     
     figure;
     % subplot(1,2,2);
     hold on
     
-    l3 = plot(trial_lengths, mean(accuracy_per_soa_valid)*100, 'Color', bright_colours(1,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
+    l3 = plot(trial_lengths, nanmean(accuracy_per_soa_valid)*100, 'Color', bright_colours(1,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
     p3 = frevede_errorbarplot(trial_lengths, accuracy_per_soa_valid*100, bright_colours(1,:), 'se');
-    l4 = plot(trial_lengths, mean(accuracy_per_soa_invalid)*100, 'Color', bright_colours(2,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(2,:));
+    l4 = plot(trial_lengths, nanmean(accuracy_per_soa_invalid)*100, 'Color', bright_colours(2,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(2,:));
     p4 = frevede_errorbarplot(trial_lengths, accuracy_per_soa_invalid*100, bright_colours(2,:), 'se');
     
     if exist('stat_a') == 1
-        invalid = mean(accuracy_per_soa_invalid)*100
-        valid = mean(accuracy_per_soa_valid)*100
+        invalid = nanmean(accuracy_per_soa_invalid)*100
+        valid = nanmean(accuracy_per_soa_valid)*100
         
         for X = trial_lengths(stat_a.mask)
             Y = find(trial_lengths == X);
@@ -203,8 +203,7 @@ if plot_averages
     % title('Response time', 'fontsize', 28)
     fontsize(30, "points");
     
-    % set(gcf,'position',[0,0, 1600,1080])
-    set(gcf,'position',[0,0, 700,1080])
+    % set(gcf,'position',[0,0, 700,1080])
     
     % subplot(1,2,1)
     
@@ -219,12 +218,12 @@ if plot_averages
     % subplot(1,2,1);
     hold on
     
-    b1 = bar([1], [mean(reaction_time_validity(:,1))], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:));
-    % b2 = bar([2], [mean(reaction_time_validity(:,2))], bar_size, FaceColor=colours(2,:), FaceAlpha=0.5, EdgeColor=colours(2,:), EdgeAlpha=0.5);
-    b2 = bar([2], [mean(reaction_time_validity(:,2))], bar_size, FaceColor=colours(2,:), EdgeColor=colours(2,:));
-    errorbar([1], [mean(reaction_time_validity(:,1))], [std(reaction_time_validity(:,1)) ./ sqrt(p)], 'LineWidth', 3, 'Color', dark_colours(1,:));
-    % errorbar([2], [mean(reaction_time_validity(:,2))], [std(reaction_time_validity(:,2)) ./ sqrt(p)], 'LineWidth', 3, 'Color', light_colours(2,:));
-    errorbar([2], [mean(reaction_time_validity(:,2))], [std(reaction_time_validity(:,2)) ./ sqrt(p)], 'LineWidth', 3, 'Color', dark_colours(2,:));
+    b1 = bar([1], [nanmean(reaction_time_validity(:,1))], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:));
+    % b2 = bar([2], [nanmean(reaction_time_validity(:,2))], bar_size, FaceColor=colours(2,:), FaceAlpha=0.5, EdgeColor=colours(2,:), EdgeAlpha=0.5);
+    b2 = bar([2], [nanmean(reaction_time_validity(:,2))], bar_size, FaceColor=colours(2,:), EdgeColor=colours(2,:));
+    errorbar([1], [nanmean(reaction_time_validity(:,1))], [std(reaction_time_validity(:,1)) ./ sqrt(p)], 'LineWidth', 3, 'Color', dark_colours(1,:));
+    % errorbar([2], [nanmean(reaction_time_validity(:,2))], [std(reaction_time_validity(:,2)) ./ sqrt(p)], 'LineWidth', 3, 'Color', light_colours(2,:));
+    errorbar([2], [nanmean(reaction_time_validity(:,2))], [std(reaction_time_validity(:,2)) ./ sqrt(p)], 'LineWidth', 3, 'Color', dark_colours(2,:));
     plot([1,2], [reaction_time_validity(:,1:2)]', 'Color', [0, 0, 0, 0.25], 'LineWidth', 1);
     
     % legend(labels, 'Location', 'southeast');
@@ -236,17 +235,17 @@ if plot_averages
     xticklabels(labels);
     % title('Response time', 'fontsize', 28)
     fontsize(30, "points");
-    set(gcf,'position',[0,0, 540,1600])
+    % set(gcf,'position',[0,0, 540,1600])
     
     figure;
     hold on
     
-    b3 = bar([1], [mean(error_validity(:,1))*100], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:));
-    b4 = bar([2], [mean(error_validity(:,2))*100], bar_size, FaceColor=colours(2,:), EdgeColor=colours(2,:));
-    % b4 = bar([2], [mean(error_validity(:,2))*100], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:), FaceAlpha=0.5, EdgeAlpha=0.5);
-    errorbar([1], [mean(error_validity(:,1))*100], [(std(error_validity(:,1)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', dark_colours(1,:));
-    % errorbar([2], [mean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', light_colours(1,:));
-    errorbar([2], [mean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', dark_colours(2,:));
+    b3 = bar([1], [nanmean(error_validity(:,1))*100], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:));
+    b4 = bar([2], [nanmean(error_validity(:,2))*100], bar_size, FaceColor=colours(2,:), EdgeColor=colours(2,:));
+    % b4 = bar([2], [nanmean(error_validity(:,2))*100], bar_size, FaceColor=colours(1,:), EdgeColor=colours(1,:), FaceAlpha=0.5, EdgeAlpha=0.5);
+    errorbar([1], [nanmean(error_validity(:,1))*100], [(std(error_validity(:,1)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', dark_colours(1,:));
+    % errorbar([2], [nanmean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', light_colours(1,:));
+    errorbar([2], [nanmean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', dark_colours(2,:));
     plot([1,2], [error_validity(:,1:2)*100]', 'Color', [0, 0, 0, 0.25], 'LineWidth', 1);
     
     % legend(labels, 'Location', 'southeast');
@@ -261,7 +260,6 @@ if plot_averages
     
     % subplot(1,2,1)
     
-    % set(gcf,'position',[0,0, 1080,1600])
-    set(gcf,'position',[0,0, 540,1600])
+    % set(gcf,'position',[0,0, 540,1600])
     
 end
