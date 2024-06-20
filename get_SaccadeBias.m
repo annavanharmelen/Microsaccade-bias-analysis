@@ -5,10 +5,10 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
-remove_prematures = 1;
-
+remove_prematures = 0;
+ 
 %% loop over participants
-for pp = [1:25];
+for pp = [7:9];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
