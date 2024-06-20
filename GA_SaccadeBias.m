@@ -411,14 +411,14 @@ if plotGAs
     legend({ 'left', 'right'});
     xlabel('pp number');
     xticks(1:size(pp2do, 2));
-    xticklabels(I);
+    xticklabels(pp2do(I));
     ylabel('number of saccades (n)');
 
     figure;
     bar(B);
     xlabel('pp number');
     xticks(1:size(pp2do, 2));
-    xticklabels(I);
+    xticklabels(pp2do(I));
     ylabel('number of saccades (n)');
     legend('total');
 
