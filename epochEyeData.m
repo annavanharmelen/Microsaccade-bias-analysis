@@ -81,7 +81,7 @@ for pp      = [23:25];
     eyedata = ft_selectdata(cfg, eyedata);
     
     %% save data as function of pp name and eyedata session
-    save([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
+    save([param.path, '\epoched_data\eyedata_AnnaMicro2','_'  param.subjName], 'eyedata');
     
     %% test plot
     % figure; 
