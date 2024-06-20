@@ -84,11 +84,11 @@ for pp      = [23:25];
     save([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
     
     %% test plot
-    figure; 
-    subplot(2,2,1); plot(eyedata.time{1}, eyedata.trial{1}); legend(eyedata.label);
-    subplot(2,2,2); plot(eyedata.time{10}, eyedata.trial{10}); legend(eyedata.label);
-    subplot(2,2,3); plot(eyedata.time{100}, eyedata.trial{100}); legend(eyedata.label);
-    subplot(2,2,4); plot(eyedata.time{200}, eyedata.trial{200}); legend(eyedata.label); 
-    
+    % figure; 
+    % subplot(2,2,1); plot(eyedata.time{1}, eyedata.trial{1}); legend(eyedata.label);
+    % subplot(2,2,2); plot(eyedata.time{10}, eyedata.trial{10}); legend(eyedata.label);
+    % subplot(2,2,3); plot(eyedata.time{100}, eyedata.trial{100}); legend(eyedata.label);
+    % subplot(2,2,4); plot(eyedata.time{200}, eyedata.trial{200}); legend(eyedata.label); 
+    % 
 %% end loops
 end % end of pp loop
