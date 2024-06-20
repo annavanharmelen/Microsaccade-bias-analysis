@@ -5,14 +5,13 @@
 clear; clc; close all;
     
 %% parameters
-remove_prematures = 1;
+remove_prematures = 0;
 
-pp2do           = [2:25];
-% pp2do = [2     4     8     9    10    14    15    18    19    20    23    24];
-% pp2do = [3, 5, 6, 7, 11, 12, 13, 16, 17, 21, 22, 25];
+pp2do           = [1:2,5:9];
+
 nsmooth         = 500;
 plotSinglePps   = 0;
-plotGAs         = 0;
+plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
 %% predefine size of some matrices
@@ -41,7 +40,7 @@ for pp = pp2do
    
     if remove_prematures == 1   toadd1 = '_removePremature'; else toadd1 = ''; end % depending on this option, append to name of saved file.
 
-    load([param.path, '\saved_data\saccadeEffects_4D_onlydowneffect', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(7,saccade.time>=200 & saccade.time<=600));
