@@ -12,7 +12,7 @@ for pp = [7:9];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaMicro1','_'  param.subjName], 'eyedata');
+    load([param.path, '\epoched_data\eyedata_AnnaMicro2','_'  param.subjName], 'eyedata');
 
     %% only keep channels of interest
     cfg = [];
