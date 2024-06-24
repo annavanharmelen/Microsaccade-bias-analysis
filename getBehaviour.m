@@ -8,7 +8,7 @@ plot_individuals = 1;
 plot_averages = 1;
 remove_prematures = 0; %this doesn't work well yet with the automatic gaze control
 
-pp2do = [1:2,5:9];
+pp2do = [1:2, 5:11];
 p = 0;
 
 

@@ -8,7 +8,7 @@ plotResults = 0;
 remove_prematures = 0;
  
 %% loop over participants
-for pp = [7:9];
+for pp = [10:11];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);

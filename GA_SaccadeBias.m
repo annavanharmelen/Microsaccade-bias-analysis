@@ -7,10 +7,10 @@ clear; clc; close all;
 %% parameters
 remove_prematures = 0;
 
-pp2do           = [1:2,5:9];
+pp2do           = [1:2,5:11];
 
 nsmooth         = 500;
-plotSinglePps   = 0;
+plotSinglePps   = 1;
 plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
@@ -103,7 +103,7 @@ if plotSinglePps
         hold on;
         plot(saccade.time, squeeze(saccade_data(sp,7,:,:)));
         plot(xlim, [0,0], '--k');
-        xlim(xlimtoplot); ylim([-0.5 0.5]);
+        xlim(xlimtoplot); ylim([-0.1 0.1]);
         title(pp2do(sp));
     end
     legend(saccade.label{7});
