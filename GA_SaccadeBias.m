@@ -23,7 +23,7 @@ avg_saccade_effect = zeros(size(pp2do, 2), 3);
 avg_saccade_axis_effect = zeros(size(pp2do, 2), 2);
 
 %% set visual parameters
-[bar_size, bright_colours, colours, dark_colours, subplot_size] = setBehaviourParam(pp2do);
+[bar_size, bright_colours, colours, light_colours, SOA_colours, dark_colours, subplot_size] = setBehaviourParam(pp2do);
 colour_map = create_colour_map(101);
 ft_size = 26;
 
