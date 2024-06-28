@@ -8,7 +8,7 @@ plotResults = 0;
 remove_prematures = 0;
  
 %% loop over participants
-for pp = [10:11];
+for pp = [1:16];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
@@ -98,17 +98,18 @@ for pp = [10:11];
     saccade = [];
     saccade.time = times;
     sel = ones(size(cueL));
-    saccade.label = {'target','opp_target','nontarget','opp_nontarget', 'target_axis', 'nontarget_axis', 'effect'};
+    saccade.label = {'target','opp_target','nontarget','opp_nontarget', 'effect', 'target_axis', 'nontarget_axis', 'axis_effect'};
 
     saccade.data(1,:) = (mean(shiftsSW(cueL&sel,:), "omitnan") + mean(shiftsSE(cueR&sel,:), "omitnan")) ./ 2;
     saccade.data(2,:) = (mean(shiftsNE(cueL&sel,:), "omitnan") + mean(shiftsNW(cueR&sel,:), "omitnan")) ./ 2;
     saccade.data(3,:) = (mean(shiftsSW(cueR&sel,:), "omitnan") + mean(shiftsSE(cueL&sel,:), "omitnan")) ./ 2;
     saccade.data(4,:) = (mean(shiftsNE(cueR&sel,:), "omitnan") + mean(shiftsNW(cueL&sel,:), "omitnan")) ./ 2;
+    saccade.data(5,:) = (saccade.data(1,:) - saccade.data(3,:)) / 2;
     
     % add aggregated fields
-    saccade.data(5,:) = (saccade.data(1,:) + saccade.data(2,:)) / 2;
-    saccade.data(6,:) = (saccade.data(3,:) + saccade.data(4,:)) / 2;
-    saccade.data(7,:) = (saccade.data(5,:) - saccade.data(6,:)) / 2;
+    saccade.data(6,:) = (saccade.data(1,:) + saccade.data(2,:)) / 2;
+    saccade.data(7,:) = (saccade.data(3,:) + saccade.data(4,:)) / 2;
+    saccade.data(8,:) = (saccade.data(6,:) - saccade.data(7,:)) / 2;
 
     
     %% smooth and turn to Hz
@@ -211,11 +212,12 @@ for pp = [10:11];
         saccadesize.data(2,c,:) = (mean(shiftsNE(cueL,:), "omitnan") + mean(shiftsNW(cueR,:), "omitnan")) ./ 2;
         saccadesize.data(3,c,:) = (mean(shiftsSW(cueR,:), "omitnan") + mean(shiftsSE(cueL,:), "omitnan")) ./ 2;
         saccadesize.data(4,c,:) = (mean(shiftsNE(cueR,:), "omitnan") + mean(shiftsNW(cueL,:), "omitnan")) ./ 2;
+        saccadesize.data(5,c,:) = (saccadesize.data(1,c,:) - saccadesize.data(3,c,:)) ./ 2;
         
         % add aggregated fields
-        saccadesize.data(5,c,:) = (saccadesize.data(1,c,:) + saccadesize.data(2,c,:)) ./ 2;
-        saccadesize.data(6,c,:) = (saccadesize.data(3,c,:) + saccadesize.data(4,c,:)) ./ 2;
-        saccadesize.data(7,c,:) = (saccadesize.data(5,c,:) - saccadesize.data(6,c,:)) ./ 2;
+        saccadesize.data(6,c,:) = (saccadesize.data(1,c,:) + saccadesize.data(2,c,:)) ./ 2;
+        saccadesize.data(7,c,:) = (saccadesize.data(3,c,:) + saccadesize.data(4,c,:)) ./ 2;
+        saccadesize.data(8,c,:) = (saccadesize.data(6,c,:) - saccadesize.data(7,c,:)) ./ 2;
     
     end
    

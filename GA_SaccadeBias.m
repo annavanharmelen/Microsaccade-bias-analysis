@@ -7,10 +7,10 @@ clear; clc; close all;
 %% parameters
 remove_prematures = 0;
 
-pp2do           = [1:2,5:11];
+pp2do           = [1:2,5:9,11,13:16];
 
 nsmooth         = 500;
-plotSinglePps   = 1;
+plotSinglePps   = 0;
 plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
@@ -43,9 +43,9 @@ for pp = pp2do
     load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
-    avg_saccade_effect(s, 1) = mean(saccade.data(7,saccade.time>=200 & saccade.time<=600));
-    avg_saccade_effect(s, 2) = mean(saccade.data(7,saccade.time>=1000 & saccade.time<=3000));
-    avg_saccade_effect(s, 3) = mean(saccade.data(7,:));
+    avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
+    avg_saccade_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000));
+    avg_saccade_effect(s, 3) = mean(saccade.data(5,:));
 
     avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
     avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000) - saccade.data(6,saccade.time>=1000 & saccade.time<=3000));
@@ -101,12 +101,12 @@ if plotSinglePps
     for sp = 1:s
         subplot(subplot_size, subplot_size,sp);
         hold on;
-        plot(saccade.time, squeeze(saccade_data(sp,7,:,:)));
+        plot(saccade.time, squeeze(saccade_data(sp,5,:,:)));
         plot(xlim, [0,0], '--k');
         xlim(xlimtoplot); ylim([-0.1 0.1]);
         title(pp2do(sp));
     end
-    legend(saccade.label{7});
+    legend(saccade.label{5});
 
     % plot 'effect' x saccadesize
     figure;
@@ -119,7 +119,7 @@ if plotSinglePps
         cfg.xlim = xlimtoplot;
         subplot(subplot_size, subplot_size,sp);
         hold on;
-        cfg.channel = 7;
+        cfg.channel = 5;
         saccadesize.effect_individual = squeeze(saccadesizes.data(sp,:,:,:));
         ft_singleplotTFR(cfg, saccadesize);
         title(pp2do(sp));
@@ -179,8 +179,8 @@ if plotGAs
     % plot both axes of directions separately
     figure;
     hold on
-    p5 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), colours(1,:), 'se');
-    p6 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,6,:)), 'b', 'se');
+    p5 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,6,:)), colours(1,:), 'se');
+    p6 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,7,:)), 'b', 'se');
     legend([p5, p6], {'target-axis', 'nontarget-axis'});
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
@@ -189,7 +189,7 @@ if plotGAs
     % plot the effect
     figure;
     hold on
-    p7 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,7,:)), bright_colours(3,:), 'se');
+    p7 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), bright_colours(3,:), 'se');
     p7.LineWidth = 2.5;
     fontsize(23, 'points')
     xlim([-500, 3100]);
@@ -254,7 +254,7 @@ if plotGAs
     
     % per condition
     figure;
-    cfg.channel = 7;
+    cfg.channel = 5;
     ft_singleplotTFR(cfg, saccadesizes);
     ylabel('Saccade size (dva)', 'FontSize', 35, 'Position', [-880 2.8750 1]);
     xlabel('Time (ms)', 'FontSize', 35);
@@ -432,9 +432,9 @@ if plotGAs
 
     % title('Saccade towards rate')
     % legend(labels, 'Location', 'southeast');
-    ylim([-0.03 0.26]);
+    % ylim([-0.03 0.26]);
     ylabel('Saccade bias (ΔHz)');
-    yticks([0 0.1 0.2]);
+    % yticks([0 0.1 0.2]);
     xlim([0.3 2.7]);
     xticks([1,2]);
     xticklabels({'Shift', 'Sustain'});
@@ -443,7 +443,7 @@ if plotGAs
     set(gcf,'position',[0,0, 650,1080])
 
     %% polar histogram of separate timeframes
-    time_edges = [1000, 3000];
+    time_edges = [200, 600];
     x = 4;
     % get indices of wanted time range
     timeidx = find(abs(saccade.time - time_edges(1)) < 0.01):find(abs(saccade.time - time_edges(2)) < 0.01);
