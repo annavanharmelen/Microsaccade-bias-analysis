@@ -4,11 +4,11 @@ clc
 
 %% set parameters and loops
 display_percentage_premature = 1;
-plot_individuals = 1;
+plot_individuals = 0;
 plot_averages = 1;
 remove_prematures = 0; %this doesn't work well yet with the automatic gaze control
 
-pp2do = [1:2,5:11,13:15];
+pp2do = [1:2,5:9,11,13:16];
 p = 0;
 
 
