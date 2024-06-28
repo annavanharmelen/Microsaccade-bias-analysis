@@ -5,12 +5,12 @@
 clear; clc; close all;
     
 %% parameters
-remove_prematures = 0;
+remove_unfixated = 1;
 
 pp2do           = [1:2,5:9,11,13:16];
 
 nsmooth         = 500;
-plotSinglePps   = 0;
+plotSinglePps   = 1;
 plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
@@ -38,7 +38,7 @@ for pp = pp2do
     % load
     disp(['getting data from participant ', param.subjName]);
    
-    if remove_prematures == 1   toadd1 = '_removePremature'; else toadd1 = ''; end % depending on this option, append to name of saved file.
+    if remove_unfixated == 1   toadd1 = '_removeUnfixated'; else toadd1 = ''; end % depending on this option, append to name of saved file.
 
     load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
     

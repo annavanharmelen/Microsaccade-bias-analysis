@@ -5,10 +5,10 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
-remove_prematures = 0;
+remove_unfixated = 1;
  
 %% loop over participants
-for pp = [1:16];
+for pp = [5];
 
     %% load epoched data of this participant data
     param = getSubjParam(pp);
@@ -26,16 +26,23 @@ for pp = [1:16];
     tl.time = tl.time * 1000;
 
     %% remove premature trials
-    if remove_prematures
+    if remove_unfixated
         % get behavioural data
         behdata = readtable(getSubjParam(pp).log);
+
+        % remove trials already not in eyedata from behavioural data
+        to_remove = ismember(behdata.exit_stage, {'stimuli_onset'});
+        behdata = behdata(logical(1-to_remove), :);
         
-        % select premature trials
-        oktrials = ismember(behdata.premature_pressed, {'False'});
+        % select unbroken trials
+        oktrials = ismember(behdata.broke_fixation, {'False'});
+
+        % select trials broken after target change
+        also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
 
         % remove non-oktrials from eye-tracking data
-        tl.trial = tl.trial(oktrials,:,:);
-        tl.trialinfo = tl.trialinfo(oktrials,:,:);
+        tl.trial = tl.trial(logical(oktrials+also_oktrials),:,:);
+        tl.trialinfo = tl.trialinfo(logical(oktrials+also_oktrials),:,:);
     end
 
     %% pixel to degree
@@ -246,8 +253,8 @@ for pp = [1:16];
 
     %% save
     % depending on this option, append to name of saved file. 
-    if remove_prematures == 1
-        toadd1 = '_removePremature';
+    if remove_unfixated == 1
+        toadd1 = '_removeUnfixated';
     else
         toadd1 = '';
     end    
