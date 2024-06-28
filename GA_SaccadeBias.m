@@ -201,6 +201,21 @@ if plotGAs
     set(gcf,'position',[0,0, 1800,900])
     xlabel('Time (ms)');
     hold off
+
+    % plot the effect - individuals
+    figure;
+    hold on
+    plot(saccade.time, squeeze(saccade_data(:,5,:)));
+    % fontsize(23, 'points')
+    xlim([-500, 3100]);
+    plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    % legend([p7], 'effect', 'EdgeColor', 'w', 'Fontsize', 28);
+    ylabel('Rate (Hz)', 'Fontsize', 28);
+    xlabel('Time (ms)', 'Fontsize', 28);
+    % set(gcf,'position',[0,0, 1800,900])
+    xlabel('Time (ms)');
+    hold off
     
     % plot only saccades towards the stimulus or the distractor
     figure;
@@ -275,27 +290,27 @@ if plotGAs
 
 
     %% compass plots on cartesian axis
-    figure;
-    subplot(1,2,1)
-    c1 = compass(avg_directions(:,1));
-    for i = 1:size(c1, 1)
-        c1(i).LineWidth = 2.5;
-        c1(i).Color = 'k';
-    end
-    
-    subplot(1,2,2)
-    c2 = compass(avg_directions(:,2));
-    for i = 1:size(c2, 1)
-        c2(i).LineWidth = 2.5;
-        c2(i).Color = 'k';
-    end
-    fontsize(25, 'points')
-    title('Right cue', 'FontSize', 35);
-    yticks([]);
-    set(gcf,'position',[0,0, 1600, 1000])
-    
-    subplot(1,2,1)
-    title('Left cue', 'FontSize', 35);
+    % figure;
+    % subplot(1,2,1)
+    % c1 = compass(avg_directions(:,1));
+    % for i = 1:size(c1, 1)
+    %     c1(i).LineWidth = 2.5;
+    %     c1(i).Color = 'k';
+    % end
+    % 
+    % subplot(1,2,2)
+    % c2 = compass(avg_directions(:,2));
+    % for i = 1:size(c2, 1)
+    %     c2(i).LineWidth = 2.5;
+    %     c2(i).Color = 'k';
+    % end
+    % fontsize(25, 'points')
+    % title('Right cue', 'FontSize', 35);
+    % yticks([]);
+    % set(gcf,'position',[0,0, 1600, 1000])
+    % 
+    % subplot(1,2,1)
+    % title('Left cue', 'FontSize', 35);
 
     %% compass plots on polar axis
     arrow_width_factor = (40/360);
@@ -313,6 +328,7 @@ if plotGAs
         polarplot([angle(avg_directions(sp,1)) - arrow_width, angle(avg_directions(sp,1))], [abs(avg_directions(sp,1)) - arrow_height, abs(avg_directions(sp,1))], '-', 'Color', 'k', 'LineWidth', x);
         polarplot([angle(avg_directions(sp,1)), angle(avg_directions(sp,1)) + arrow_width], [abs(avg_directions(sp,1)), abs(avg_directions(sp,1)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x); 
     end
+    rlim([0 1.2]);
     rticks([1]);
     thetaticks([0:45:360]);
 
@@ -326,13 +342,14 @@ if plotGAs
         polarplot([angle(avg_directions(sp,2)) - arrow_width, angle(avg_directions(sp,2))], [abs(avg_directions(sp,2)) - arrow_height, abs(avg_directions(sp,2))], '-', 'Color', 'k', 'LineWidth', x);
         polarplot([angle(avg_directions(sp,2)), angle(avg_directions(sp,2)) + arrow_width], [abs(avg_directions(sp,2)), abs(avg_directions(sp,2)) - arrow_height], '-', 'Color', 'k', 'LineWidth', x);
     end
+    rlim([0 1.2]);
     rticks([1]);
     thetaticks([0:45:360]);
     fontsize(30, 'points')
-    % title('Right cue', 'FontSize', 35);
+    title('Right cue', 'FontSize', 35);
     
     subplot(1,2,1)
-    % title('Left cue', 'FontSize', 35);
+    title('Left cue', 'FontSize', 35);
     set(gcf,'position',[0,0, 1600, 1000])
     %% plot aggregated polar histogram of all saccades (no weighting)
     bin_edges = [0 1 2 3 4 5 6];
