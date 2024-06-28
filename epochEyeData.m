@@ -4,7 +4,7 @@
 clear; clc; close all;
 
 %% set loops
-for pp      = [10:11];
+for pp      = [16];
 
     %% Set trig labels and epoch timings
     values2use  = 21:28; % cue onset

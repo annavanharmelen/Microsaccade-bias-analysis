@@ -3,7 +3,7 @@ function param = getSubjParam(pp)
 %% participant-specific notes
 
 %% set path and pp-specific file locations
-unique_numbers = [65, 34, 56, 26, 97, 15, 78, 70, 44, 67, 61]; %needs to be in the right order
+unique_numbers = [65, 34, 56, 26, 97, 15, 78, 70, 44, 67, 61, 17, 86, 10, 28, 48]; %needs to be in the right order
 
 param.path = '\\labsdfs.labs.vu.nl\labsdfs\FGB-ETP-CogPsy-ProactiveBrainLab\core_lab_members\Anna\Data\m2 - microsaccade bias shift vs. sustain with fixational control\';
 
