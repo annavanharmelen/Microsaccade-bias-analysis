@@ -3,12 +3,12 @@ close all
 clc
 
 %% set parameters and loops
-display_percentage_premature = 1;
+display_percentage_premature = 0;
+display_percentage_unbroken = 1;
 plot_individuals = 0;
 plot_averages = 1;
-remove_prematures = 0; %this doesn't work well yet with the automatic gaze control
 
-pp2do = [1:2,5:9,11,13:16];
+pp2do = [1:2,5:9,11,13:24, 26:29];
 p = 0;
 
 
@@ -22,6 +22,7 @@ missed_orientations = zeros(size(pp2do, 2), (size(orientation_bins, 2) - 1));
 
 for pp = pp2do
     p = p+1;
+    ppnum(p) = pp;
     figure_nr = 1;
     figure_nr =  figure_nr+5;
     
@@ -35,13 +36,23 @@ for pp = pp2do
     if display_percentage_premature
         fprintf('%s has %.2f%% premature responses\n\n', param.subjName, nanmean(ismember(behdata.premature_pressed, {'True'}))*100)
     end
+
+    %% check unbroken trials
+    oktrials = ismember(behdata.broke_fixation, {'False'});
+
+    % select trials broken after target change
+    also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
     
-    %% remove premature trials
-    if remove_prematures
-        oktrials = ismember(behdata.premature_pressed, {'False'});
-        behdata = behdata(oktrials, :);
+    % save percentage
+    percentageok(p,1) = (sum(oktrials+also_oktrials) / max(behdata.trial_number))*100;
+    
+    % save oktrials
+    oktrials = logical(oktrials + also_oktrials);
+    
+    % display percentage unbroken trials
+    if display_percentage_unbroken
+        fprintf('%s has %.2f%% unbroken trials\n\n', param.subjName, percentageok(p,1))
     end
-    
     %% basic data checks, each pp in own subplot
     if plot_individuals
         figure(figure_nr);
@@ -74,7 +85,11 @@ for pp = pp2do
     left_trials = ismember(behdata.target_bar, {'left'});
     right_trials = ismember(behdata.target_bar, {'right'});
     
+    
     %% extract data of interest
+    overall_dt(p,1) = nanmean(behdata.response_time_in_ms(oktrials));
+    overall_error(p,1) = sum(ismember(behdata.feedback, 'correct')&oktrials) / sum(oktrials);
+
     labels = {'valid','invalid'};
     
     reaction_time_validity(p,1) = nanmean(behdata.response_time_in_ms(valid_trials));
@@ -82,6 +97,7 @@ for pp = pp2do
     
     error_validity(p,1)      = nanmean(correct_trials(valid_trials));
     error_validity(p,2)      = nanmean(correct_trials(invalid_trials));
+        
     %% get reaction time as function of SOA
     for i = 1:size(trial_lengths, 2)
         reaction_time_per_soa_valid(p,i) = nanmean(behdata.response_time_in_ms(valid_trials&behdata.static_duration==trial_lengths(i)));
@@ -136,9 +152,30 @@ for pp = pp2do
     
 end
 
-%% show grand average line graphs of data as function of SOA
 if plot_averages
-    
+ %% check performance
+    figure; 
+    subplot(3,1,1);
+    bar(ppnum, overall_dt(:,1));
+    title('overall decision time');
+    % ylim([0 900]);
+    xlabel('pp #');
+
+    subplot(3,1,2);
+    bar(ppnum, overall_error(:,1));
+    title('overall error');
+    line([1 29], [0.5 0.5])
+    ylim([0.4 1]);
+    xlabel('pp #');
+
+    subplot(3,1,3);
+    bar(ppnum, percentageok);
+    title('percentage ok trials');
+    % ylim([90 100]);
+    xlabel('pp #');
+
+%% show grand average line graphs of data as function of SOA
+
     figure(figure_nr)
     figure_nr = figure_nr+1;
     % subplot(1,2,2);
