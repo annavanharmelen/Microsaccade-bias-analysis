@@ -31,9 +31,9 @@ dark_colours = [46, 71, 52;...
 dark_colours = dark_colours/255;
 
 labels = {'valid','invalid'};
-percentageok = zeros(size(pp2do));
-overall_dt = zeros(size(pp2do));
-overall_error = zeros(size(pp2do));
+percentageok = zeros(size(pp2do, 2), 1);
+overall_dt = zeros(size(pp2do, 2), 1);
+overall_error = zeros(size(pp2do, 2), 1);
 
 subplot_size = ceil(sqrt(size(pp2do, 2)));
 end
