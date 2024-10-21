@@ -6,8 +6,8 @@
 statcfg.xax = trial_lengths;
 statcfg.npermutations = 1000;
 statcfg.clusterStatEvalaluationAlpha = 0.05;
-statcfg.nsub = p;
-statcfg.statMethod = 'montecarlo';
+statcfg.nsub = 24;
+statcfg.statMethod = 'analytic';
 
 data_cond1 = accuracy_per_soa_valid;
 data_cond2 = accuracy_per_soa_invalid;
@@ -33,7 +33,7 @@ frevede_allbyall_correlations_new(datamat, labels)
 %% Make correlation plot
 figure;
 hold on
-scatter(-rt_effect, avg_saccade_effect(:,3), 100, 'k', 'filled');
+scatter(-rt_effect, avg_saccade_effect(:,1), 100, 'k', 'filled');
 l1 = lsline;
 l1.LineWidth = 2.5;
 l1.Color = [0.6, 0.6, 0.6];
@@ -50,7 +50,7 @@ set(gcf,'position',[0,0, 850, 800]);
 
 figure;
 hold on
-scatter(acc_effect*100, avg_saccade_effect(:,3), 100, 'k', 'filled');
+scatter(acc_effect*100, avg_saccade_effect(:,1), 100, 'k', 'filled');
 l2 = lsline;
 l2.LineWidth = 2.5;
 l2.Color = [0.6, 0.6, 0.6];
