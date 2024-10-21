@@ -13,19 +13,20 @@ ft_size = 26;
 
 data_cond1 = saccade_data(:,1,:);
 data_cond2 = saccade_data(:,3,:);
-data_cond4 = zeros(size(data_cond1));
+data_cond3 = saccade_data(:,5,451:1951);
+data_cond4 = zeros(size(data_cond3))
 
-stat = frevede_ftclusterstat1D(statcfg, data_cond1, data_cond2)
-stat1 = frevede_ftclusterstat1D(statcfg, data_cond1, data_cond4)
-stat2 = frevede_ftclusterstat1D(statcfg, data_cond2, data_cond4)
+stat = frevede_ftclusterstat1D(statcfg, data_cond3, data_cond4)
+% stat1 = frevede_ftclusterstat1D(statcfg, data_cond1, data_cond4)
+% stat2 = frevede_ftclusterstat1D(statcfg, data_cond2, data_cond4)
 %% Saccade bias data - plot only effect
 mask_xxx = double(stat.mask);
 mask_xxx(mask_xxx==0) = nan; % nan data that is not part of mark
 
 figure; hold on;
-ylimit = [-0.02, 0.06];
+% ylimit = [-0.02, 0.06];
 
-p3 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,7,:)), [0.6, 0.6, 0.6], 'se');
+p3 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), bright_colours(3,:), 'se');
 p3.LineWidth = 3.5;
 
 
@@ -41,7 +42,7 @@ p3.LineWidth = 3.5;
 % p3.LineWidth = 3.5;
 
 plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-plot([0,0], ylimit, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+plot([0,0], [0.02, 0.02], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
 % plot([200,200], ylimit, '--', 'LineWidth',4, 'Color', bright_colours(3,:));
 % plot([600,600], ylimit, '--', 'LineWidth',4, 'Color', bright_colours(3,:));
 % plot([1000,1000], ylimit, '--', 'LineWidth',4, 'Color', bright_colours(4,:));
@@ -49,12 +50,12 @@ plot([0,0], ylimit, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
 % 
 
 xlim(xlimtoplot);
-sig = plot(saccade.time, mask_xxx*-0.01, 'Color', 'k', 'LineWidth', 5); % verticaloffset for positioning of the "significance line"
+sig = plot(saccade.time(451:1951), mask_xxx*-0.01, 'Color', 'k', 'LineWidth', 5); % verticaloffset for positioning of the "significance line"
 % ylim(ylimit+[0 0.0001]);
-ylabel('Saccade bias (ΔHz)', 'Position', [-892.5697 0.0200 -1]);
+ylabel('Saccade bias (ΔHz)');
 xlabel('Time (ms)');
 % xticks([200 600 1000 3000])
-yticks([0 0.05]);
+% yticks([0 0.05]);
 set(gcf,'position',[0,0, 1800,900])
 fontsize(ft_size*1.5,"points")
 % legend([p1,p2,p3], saccade.label(2:4));
