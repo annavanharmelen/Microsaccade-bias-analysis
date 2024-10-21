@@ -4,7 +4,7 @@
 clear; clc; close all;
 
 %% set loops
-for pp      = [16];
+for pp      = [23:29];
 
     %% Set trig labels and epoch timings
     values2use  = 21:28; % cue onset
@@ -54,7 +54,7 @@ for pp      = [16];
     end
     
     % get trl with begin sample, endsample, and offset
-    trloi = match_str(event.label, lab2use); % trl of interest from all events
+    trloi = match_str(event.label, lab2use); % event of interest from all events
     soi = event.sample(trloi)'; % samples of interest, given trials of interest.
     trl_eye = [soi+prestim*hdr.Fs, soi+(poststim-0.001)*hdr.Fs, ones(length(soi),1)*prestim*hdr.Fs]; % determine startsample, endsample, and offset
     
