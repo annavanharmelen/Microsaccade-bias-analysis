@@ -7,10 +7,10 @@ clear; clc; close all;
 %% parameters
 remove_unfixated = 1;
 
-pp2do           = [1:2,5:9,11,13:16];
+pp2do           = [1:2,5:9,11,13:24, 26:29];
 
 nsmooth         = 500;
-plotSinglePps   = 1;
+plotSinglePps   = 0;
 plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
