@@ -3,8 +3,11 @@
 %% start clean
 clear; clc; close all;
 
+%% settings
+nan_trial_overlap = 1;
+
 %% set loops
-for pp      = [23:29];
+for pp      = [1:29];
 
     %% Set trig labels and epoch timings
     values2use  = 21:28; % cue onset
@@ -70,7 +73,30 @@ for pp      = [23:29];
         eyedata.time{trl} = prestim:1/hdr.Fs:poststim-1/hdr.Fs; % for some reason timing was way off an inconsistent across pp, even though trl_eye looked fine. Hopefully this corrects it...
     end
     eyedata.trialinfo(:,1) = trigval';
-    
+
+    %% NaN all data after response trigger
+    if nan_trial_overlap
+        trial_end_samples = [];
+        trial_end_trigger = {};
+
+        % Get final triggers + corresponding samples from each trial
+        for trig_idx = 1:length(event.label(trloi))-1
+            trial_end_samples(trig_idx) = event.sample(trloi(trig_idx + 1) - 2);
+            trial_end_trigger(trig_idx) = event.label(trloi(trig_idx + 1) - 2);
+        end
+
+        % Get final trigger + sample
+        trial_end_samples(end+1) = event.sample(end);
+        trial_end_trigger(end+1) = event.label(end);
+
+        % NaN all data from trigger sample onwards
+        for trial_idx = 1:length(eyedata.sampleinfo)
+            if trial_end_samples(trial_idx) < eyedata.sampleinfo(trial_idx,2)
+                time_diff = eyedata.sampleinfo(trial_idx,2) - trial_end_samples(trial_idx);
+                eyedata.trial{trial_idx}(:,end-(time_diff-1):end) = nan(size(eyedata.trial{trial_idx}(:,end-(time_diff-1):end)));
+            end
+        end
+    end
     %% get to three channels
     % we only need x-axis, y-axis, & pupil from now on
     eyedata.label(2:4) = {'eyeX','eyeY','eyePupil'};
@@ -81,7 +107,14 @@ for pp      = [23:29];
     eyedata = ft_selectdata(cfg, eyedata);
     
     %% save data as function of pp name and eyedata session
-    save([param.path, '\epoched_data\eyedata_AnnaMicro2','_'  param.subjName], 'eyedata');
+    % depending on this option, append to name of saved file. 
+    if nan_trial_overlap == 1
+        toadd1 = '_NaNtrialoverlap';
+    else
+        toadd1 = '';
+    end    
+
+    save([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, '__', param.subjName], 'eyedata');
     
     %% test plot
     % figure; 

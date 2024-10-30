@@ -6,13 +6,20 @@ clear; clc; close all;
 %% parameter
 plotResults = 0;
 remove_unfixated = 1;
- 
+nan_trial_overlap = 1;
+
 %% loop over participants
-for pp = [5];
+for pp = [17:29];
 
     %% load epoched data of this participant data
+    if nan_trial_overlap == 1
+        toadd1 = '_NaNtrialoverlap';
+    else
+        toadd1 = '';
+    end    
+
     param = getSubjParam(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaMicro2','_'  param.subjName], 'eyedata');
+    load([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, '__', param.subjName], 'eyedata');
 
     %% only keep channels of interest
     cfg = [];
@@ -76,6 +83,24 @@ for pp = [5];
     time_input = tl.time;
 
     [shiftsX,shiftsY, peakvelocity, times] = PBlab_gazepos2shift_2D(cfg, data_input(:,chX,:), data_input(:,chY,:), time_input);
+    
+    %% turn post-change data to NaN
+    if remove_unfixated == 0
+        behdata = readtable(param.log);
+        trial_length = behdata.static_duration();
+    end
+    
+    if remove_unfixated
+        trial_length = behdata.static_duration(logical(oktrials+also_oktrials));
+    end
+
+    for trial = 1:length(trial_length)
+        selection = times > trial_length(trial);
+
+        shiftsX(trial, selection) = NaN;
+        shiftsY(trial, selection) = NaN;
+        peakvelocity(trial, selection) = NaN;
+    end
 
     %% select usable gaze shifts
     minDisplacement = 0;
@@ -88,23 +113,10 @@ for pp = [5];
     shiftsSE = double(shiftsX>0 & shiftsY<0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement));
     shiftsSW = double(shiftsX<0 & shiftsY<0 & (saccadesizes>minDisplacement & saccadesizes<maxDisplacement));
 
-    %% turn post-change data to NaN
-    behdata = readtable(param.log);
-    trial_length = behdata.static_duration;
-
-    for trial = 1:length(trial_length)
-        selection = times > trial_length(trial);
-
-        shiftsNE(trial, selection) = NaN;
-        shiftsNW(trial, selection) = NaN;
-        shiftsSE(trial, selection) = NaN;
-        shiftsSW(trial, selection) = NaN;
-    end
-
     %% get relevant contrasts out
     saccade = [];
     saccade.time = times;
-    sel = ones(size(cueL));
+    sel = ones(size(cueL)); %NB: selection of oktrials has happened at the start when remove_unfixated is "on".
     saccade.label = {'target','opp_target','nontarget','opp_nontarget', 'effect', 'target_axis', 'nontarget_axis', 'axis_effect'};
 
     saccade.data(1,:) = (mean(shiftsSW(cueL&sel,:), "omitnan") + mean(shiftsSE(cueR&sel,:), "omitnan")) ./ 2;
@@ -228,11 +240,55 @@ for pp = [5];
     
     end
    
+    %% also get as function of trial length - identical as above, except for trial lengt
+    saccade_lengthsplit = [];
+    saccade_lengthsplit.dimord = 'chan_freq_time';
+    saccade_lengthsplit.freq = unique(trial_length)'; % trial lengths, as if "frequency axis" for time-frequency plot
+    saccade_lengthsplit.time = times;
+    saccade_lengthsplit.label = saccade.label;
+
+    c = 0;
+    for tl = saccade_lengthsplit.freq;
+        c = c+1;
+        
+        shiftsNE = [];
+        shiftsNW = [];
+        shiftsSE = [];
+        shiftsSW = [];
+
+        shiftsNE = double(shiftsX(trial_length == tl,:)>0 & shiftsY(trial_length == tl,:)>0);
+        shiftsNW = double(shiftsX(trial_length == tl,:)<0 & shiftsY(trial_length == tl,:)>0);
+        shiftsSE = double(shiftsX(trial_length == tl,:)>0 & shiftsY(trial_length == tl,:)<0);
+        shiftsSW = double(shiftsX(trial_length == tl,:)<0 & shiftsY(trial_length == tl,:)<0);
+        
+        % NaN data after orientation change
+        for trial = 1:length(trial_length)
+            selection = times > trial_length(trial);
+            shiftsNE(trial, selection) = NaN;
+            shiftsNW(trial, selection) = NaN;
+            shiftsSE(trial, selection) = NaN;
+            shiftsSW(trial, selection) = NaN;
+        end
+
+        saccade_lengthsplit.data(1,c,:) = (mean(shiftsSW(cueL,:), "omitnan") + mean(shiftsSE(cueR,:), "omitnan")) ./ 2;
+        saccade_lengthsplit.data(2,c,:) = (mean(shiftsNE(cueL,:), "omitnan") + mean(shiftsNW(cueR,:), "omitnan")) ./ 2;
+        saccade_lengthsplit.data(3,c,:) = (mean(shiftsSW(cueR,:), "omitnan") + mean(shiftsSE(cueL,:), "omitnan")) ./ 2;
+        saccade_lengthsplit.data(4,c,:) = (mean(shiftsNE(cueR,:), "omitnan") + mean(shiftsNW(cueL,:), "omitnan")) ./ 2;
+        saccade_lengthsplit.data(5,c,:) = (saccade_lengthsplit.data(1,c,:) - saccade_lengthsplit.data(3,c,:)) ./ 2;
+        
+        % add aggregated fields
+        saccade_lengthsplit.data(6,c,:) = (saccade_lengthsplit.data(1,c,:) + saccade_lengthsplit.data(2,c,:)) ./ 2;
+        saccade_lengthsplit.data(7,c,:) = (saccade_lengthsplit.data(3,c,:) + saccade_lengthsplit.data(4,c,:)) ./ 2;
+        saccade_lengthsplit.data(8,c,:) = (saccade_lengthsplit.data(6,c,:) - saccade_lengthsplit.data(7,c,:)) ./ 2;
+    
+    end
+
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
    
     for i = 1:size(saccade.label, 2)
         saccadesize.data(i,:,:) = smoothdata(saccadesize.data(i,:,:), 3, 'movmean', integrationwindow)*1000;
+        saccade_lengthsplit.data(i,:,:) = smoothdata(saccade_lengthsplit.data(i,:,:), 3, 'movmean', integrationwindow)*1000;
     end
     
     %% plot results
@@ -253,13 +309,19 @@ for pp = [5];
 
     %% save
     % depending on this option, append to name of saved file. 
-    if remove_unfixated == 1
-        toadd1 = '_removeUnfixated';
+    if nan_trial_overlap == 1
+        toadd1 = '_NaNtrialoverlap';
     else
         toadd1 = '';
     end    
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize');
+    if remove_unfixated == 1
+        toadd2 = '_removeUnfixated';
+    else
+        toadd2 = '';
+    end    
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop

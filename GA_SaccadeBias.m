@@ -6,12 +6,14 @@ clear; clc; close all;
     
 %% parameters
 remove_unfixated = 1;
+nan_trial_overlap = 1;
+
 
 pp2do           = [1:2,5:9,11,13:24, 26:29];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
-plotGAs         = 1;
+plotGAs         = 0;
 xlimtoplot      = [-500 3200];
 
 %% predefine size of some matrices
@@ -38,9 +40,19 @@ for pp = pp2do
     % load
     disp(['getting data from participant ', param.subjName]);
    
-    if remove_unfixated == 1   toadd1 = '_removeUnfixated'; else toadd1 = ''; end % depending on this option, append to name of saved file.
+    if nan_trial_overlap == 1
+        toadd1 = '_NaNtrialoverlap';
+    else
+        toadd1 = '';
+    end    
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, '__', param.subjName], 'saccade','saccadesize', 'saccadedirection');
+    if remove_unfixated == 1
+        toadd2 = '_removeUnfixated';
+    else
+        toadd2 = '';
+    end    
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
