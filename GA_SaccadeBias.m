@@ -79,6 +79,7 @@ for pp = pp2do
     for i = 1:size(saccadesize.data, 1)
         saccade_data(s,i,:) = saccade.data(i,:);
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
+        saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
     end
 
     % take average of polar hist data
@@ -104,6 +105,15 @@ saccadesizes.freq = saccadesize.freq;
 
 for i = 1:size(saccadesize.data, 1)
     saccadesizes.avg_data(i,:,:) = squeeze(mean(saccadesizes.data(:,i,:,:)));
+end
+
+saccade_lengths.dimord = saccade_lengthsplit.dimord;
+saccade_lengths.label = saccade_lengthsplit.label;
+saccade_lengths.time = saccade_lengthsplit.time;
+saccade_lengths.freq = saccade_lengthsplit.freq;
+
+for i = 1:size(saccade_lengthsplit.data, 1)
+    saccade_lengths.avg_data(i,:,:) = squeeze(mean(saccade_lengths.data(:,i,:,:)));
 end
 
 %% all subs
@@ -299,7 +309,29 @@ if plotGAs
     text(2420, 5.025, 'Centre', 'FontSize', 34, 'Color', [0,68,27]/255);
     text(2420, 3.755, 'Border', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
     text(1520, 1, 'Microsaccade range', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
-
+    
+    
+    %% just effect as function of SOA
+    cfg = [];
+    cfg.parameter = 'avg_data';
+    cfg.figure = 'gcf';
+    cfg.zlim = 'maxabs';
+    cfg.xlim = xlimtoplot;  
+    cfg.colormap = brewermap(1000, 'PRGn');
+    
+    % per condition
+    figure;
+    cfg.channel = 5;
+    ft_singleplotTFR(cfg, saccade_lengths);
+    ylabel('SOA (ms)', 'FontSize', 35);
+    xlabel('Time (ms)', 'FontSize', 35);
+    zticks([]);
+    hold on
+    set(gcf,'position',[0,0, 1800, 750])
+    xlim([-450, 3050]);
+    % ylim([0.25 5.5]);
+    title('', 'FontSize', 39);
+    fontsize(39,"points");
 
     %% compass plots on cartesian axis
     % figure;
