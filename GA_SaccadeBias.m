@@ -262,6 +262,16 @@ if plotGAs
     set(gcf,'position',[0,0, 1800,900])
     hold off
     
+    %% relative saccade bias over time
+    a = mean(squeeze(saccade_data(:,1,:)));
+    b = mean(squeeze(saccade_data(:,3,:)));
+    figure;
+    hold on
+    p10 = plot(saccade.time, ((a-b)./b)*100);
+    ylabel('Rate (Hz)');
+    xlabel('Time (ms)');
+    hold off
+    
     %% as function of saccade size
     cfg = [];
     cfg.parameter = 'avg_data';
