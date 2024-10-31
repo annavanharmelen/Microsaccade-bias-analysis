@@ -5,15 +5,15 @@
 clear; clc; close all;
     
 %% parameters
-remove_unfixated = 1;
+remove_unfixated = 0;
 nan_trial_overlap = 1;
 
 
-pp2do           = [1:2,5:9,11,13:24, 26:29];
+pp2do           = [2:25];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
-plotGAs         = 0;
+plotGAs         = 1;
 xlimtoplot      = [-500 3200];
 
 %% predefine size of some matrices
@@ -505,7 +505,7 @@ if plotGAs
 
     %% polar histogram of separate timeframes
     time_edges = [200, 600];
-    x = 4;
+    x = 3;
     % get indices of wanted time range
     timeidx = find(abs(saccade.time - time_edges(1)) < 0.01):find(abs(saccade.time - time_edges(2)) < 0.01);
 

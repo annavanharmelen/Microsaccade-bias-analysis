@@ -8,7 +8,7 @@ display_percentage_unbroken = 1;
 plot_individuals = 0;
 plot_averages = 1;
 
-pp2do = [1:2,5:9,11,13:24, 26:29];
+pp2do = [2:25];
 p = 0;
 
 
@@ -38,21 +38,9 @@ for pp = pp2do
     end
 
     %% check unbroken trials
-    oktrials = ismember(behdata.broke_fixation, {'False'});
+    % no fixational control yet, so no broken trials
+    oktrials = ones(size(behdata, 1), 1);
 
-    % select trials broken after target change
-    also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
-    
-    % save percentage
-    percentageok(p,1) = (sum(oktrials+also_oktrials) / max(behdata.trial_number))*100;
-    
-    % save oktrials
-    oktrials = logical(oktrials + also_oktrials);
-    
-    % display percentage unbroken trials
-    if display_percentage_unbroken
-        fprintf('%s has %.2f%% unbroken trials\n\n', param.subjName, percentageok(p,1))
-    end
     %% basic data checks, each pp in own subplot
     if plot_individuals
         figure(figure_nr);

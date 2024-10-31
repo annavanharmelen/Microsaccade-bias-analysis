@@ -7,7 +7,7 @@ clear; clc; close all;
 nan_trial_overlap = 1;
 
 %% set loops
-for pp      = [1:29];
+for pp      = [1:25];
 
     %% Set trig labels and epoch timings
     values2use  = 21:28; % cue onset
@@ -114,7 +114,7 @@ for pp      = [1:29];
         toadd1 = '';
     end    
 
-    save([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, '__', param.subjName], 'eyedata');
+    save([param.path, '\epoched_data\eyedata_AnnaMicro1', toadd1, '__', param.subjName], 'eyedata');
     
     %% test plot
     % figure; 
