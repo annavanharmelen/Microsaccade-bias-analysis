@@ -1,4 +1,4 @@
-function param = getSubjParam(pp)
+function param = getSubjParam2(pp)
 
 %% participant-specific notes
 

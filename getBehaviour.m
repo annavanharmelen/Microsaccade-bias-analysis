@@ -8,7 +8,10 @@ display_percentage_unbroken = 1;
 plot_individuals = 0;
 plot_averages = 1;
 
-pp2do = [1:2,5:9,11,13:24, 26:29];
+pp2do = [2:25, 1:2,5:9,11,13:24, 26:29];
+xlabels = string(pp2do);
+xlabels(1:24) = append(xlabels(1:24), " E1");
+xlabels(25:end) = append(xlabels(25:end), " E2");
 p = 0;
 
 
@@ -26,8 +29,15 @@ for pp = pp2do
     figure_nr = 1;
     figure_nr =  figure_nr+5;
     
-    param = getSubjParam(pp);
-    disp(['getting data from ', param.subjName]);
+    if p <=24
+        param = getSubjParam1(pp);
+        experiment = 'M1';
+    else
+        param = getSubjParam2(pp);
+        experiment = 'M2';
+    end
+
+    disp(['getting data from ', param.subjName, ' - ', experiment]);
     
     %% load actual behavioural data
     behdata = readtable(param.log);
@@ -38,17 +48,22 @@ for pp = pp2do
     end
 
     %% check unbroken trials
-    oktrials = ismember(behdata.broke_fixation, {'False'});
+    if p <=24
+        oktrials = ones(size(behdata,1),1);
+        
+    else
+        oktrials = ismember(behdata.broke_fixation, {'False'});
+    
+        % select trials broken after target change
+        also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
+        
+        % save percentage
+        percentageok(p,1) = (sum(oktrials+also_oktrials) / max(behdata.trial_number))*100;
+        
+        % save oktrials
+        oktrials = logical(oktrials + also_oktrials);
+    end
 
-    % select trials broken after target change
-    also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
-    
-    % save percentage
-    percentageok(p,1) = (sum(oktrials+also_oktrials) / max(behdata.trial_number))*100;
-    
-    % save oktrials
-    oktrials = logical(oktrials + also_oktrials);
-    
     % display percentage unbroken trials
     if display_percentage_unbroken
         fprintf('%s has %.2f%% unbroken trials\n\n', param.subjName, percentageok(p,1))
@@ -156,20 +171,20 @@ if plot_averages
  %% check performance
     figure; 
     subplot(3,1,1);
-    bar(ppnum, overall_dt(:,1));
+    bar(xlabels, overall_dt(:,1));
     title('overall decision time');
     % ylim([0 900]);
     xlabel('pp #');
 
     subplot(3,1,2);
-    bar(ppnum, overall_error(:,1));
-    title('overall error');
-    line([1 29], [0.5 0.5])
-    ylim([0.4 1]);
+    bar(xlabels, overall_error(:,1));
+    title('overall accuracy');
+    line([1 48], [0.5 0.5])
+    ylim([0.2 1]);
     xlabel('pp #');
 
     subplot(3,1,3);
-    bar(ppnum, percentageok);
+    bar(xlabels, percentageok);
     title('percentage ok trials');
     % ylim([90 100]);
     xlabel('pp #');

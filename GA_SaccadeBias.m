@@ -9,7 +9,7 @@ remove_unfixated = 1;
 nan_trial_overlap = 1;
 
 
-pp2do           = [1:2,5:9,11,13:24, 26:29];
+pp2do = [2:25, 1:2,5:9,11,13:24, 26:29];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
@@ -34,11 +34,17 @@ s = 0;
 for pp = pp2do
     s = s+1;
 
-    % get participant data
-    param = getSubjParam(pp);
+    if s <=24
+        param = getSubjParam1(pp);
+        experiment = 'M1';
+    else
+        param = getSubjParam2(pp);
+        experiment = 'M2';
+    end
+
 
     % load
-    disp(['getting data from participant ', param.subjName]);
+    disp(['getting data from ', param.subjName, ' - ', experiment]);
    
     if nan_trial_overlap == 1
         toadd1 = '_NaNtrialoverlap';
@@ -46,7 +52,7 @@ for pp = pp2do
         toadd1 = '';
     end    
 
-    if remove_unfixated == 1
+    if remove_unfixated == 1 & s>24
         toadd2 = '_removeUnfixated';
     else
         toadd2 = '';
@@ -489,7 +495,8 @@ if plotGAs
     b2 = bar([2], [mean(avg_saccade_effect(:,2))], bar_size, FaceColor=colours(4,:), EdgeColor=colours(4,:));
     errorbar([1], [mean(avg_saccade_effect(:,1))], [std(avg_saccade_effect(:,1)) ./ sqrt(size(pp2do, 2))], 'LineWidth', 3, 'Color', dark_colours(3,:));
     errorbar([2], [mean(avg_saccade_effect(:,2))], [std(avg_saccade_effect(:,2)) ./ sqrt(size(pp2do, 2))], 'LineWidth', 3, 'Color', dark_colours(4,:));
-    plot([1,2], [avg_saccade_effect(:,1:2)]', 'Color', [0, 0, 0, 0.25], 'LineWidth', 1);
+    plot([1,2], [avg_saccade_effect(1:24,1:2)]', 'Color', [1, 0, 0, 0.25], 'LineWidth', 1);
+    plot([1,2], [avg_saccade_effect(25:end,1:2)]', 'Color', [0, 0, 1, 0.25], 'LineWidth', 1);
 
     % title('Saccade towards rate')
     % legend(labels, 'Location', 'southeast');
