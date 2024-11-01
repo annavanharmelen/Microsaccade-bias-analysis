@@ -118,6 +118,19 @@ end
 
 %% all subs
 if plotSinglePps
+    % plot toward and away
+    figure;
+    for sp = 1:s
+        subplot(subplot_size, subplot_size,sp);
+        hold on;
+        plot(saccade.time, squeeze(saccade_data(sp,1,:,:)));
+        plot(saccade.time, squeeze(saccade_data(sp,3,:,:)));
+        plot(xlim, [0,0], '--k');
+        xlim(xlimtoplot);
+        % ylim([-0.1 0.3]);
+        title(pp2do(sp));
+    end
+    legend(saccade.label{[1,3]});
     % plot 'effect'
     figure;
     for sp = 1:s
