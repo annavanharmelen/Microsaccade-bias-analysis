@@ -6,7 +6,7 @@ clc
 display_percentage_premature = 0;
 display_percentage_unbroken = 1;
 plot_individuals = 0;
-plot_averages = 1;
+plot_averages = 0;
 
 pp2do = [2:25];
 p = 0;
@@ -250,9 +250,9 @@ if plot_averages
             end
         end
         
-        ylim([0 400]);
+        ylim([0 300]);
         ylabel('Time (ms)');
-        yticks([0 200 400]);
+        % yticks([0 200 400]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks([500 1400 2300 3200]);
         xlabel('SOA (ms)');
@@ -281,9 +281,9 @@ if plot_averages
             end
         end
         
-        ylim([0 30]);
+        ylim([0 15]);
         ylabel('Correct (%)');
-        yticks([0 15 30]);
+        % yticks([0 15 30]);
         xlim([min(trial_lengths) max(trial_lengths)]);
         xticks([500 1400 2300 3200]);
         xlabel('SOA (ms)');
