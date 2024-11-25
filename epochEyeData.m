@@ -4,7 +4,8 @@
 clear; clc; close all;
 
 %% settings
-nan_trial_overlap = 1;
+nan_trial_overlap = 0;
+nan_post_target = 1;
 
 %% set loops
 for pp      = [1:29];
@@ -75,6 +76,28 @@ for pp      = [1:29];
     eyedata.trialinfo(:,1) = trigval';
 
     %% NaN all data after response trigger
+    if nan_post_target
+        trial_end_samples = [];
+        trial_end_trigger = {};
+
+        % Get final triggers + corresponding samples from each trial
+        % NOTE: THIS DOESN'T REMOVE TRIALS THAT END IN A 10.. TRIGGER
+        % (indicating trial interruption by fixational control)
+        for trig_idx = 1:length(event.label(trloi))
+            trial_end_samples(trig_idx) = event.sample(trloi(trig_idx) + 1);
+            trial_end_trigger(trig_idx) = event.label(trloi(trig_idx) + 1);
+        end
+
+        % NaN all data from trigger sample onwards
+        for trial_idx = 1:length(eyedata.sampleinfo)
+            if trial_end_samples(trial_idx) < eyedata.sampleinfo(trial_idx,2)
+                time_diff = eyedata.sampleinfo(trial_idx,2) - trial_end_samples(trial_idx);
+                eyedata.trial{trial_idx}(:,end-(time_diff-1):end) = nan(size(eyedata.trial{trial_idx}(:,end-(time_diff-1):end)));
+            end
+        end
+    end
+
+    %% NaN all data after orientation change
     if nan_trial_overlap
         trial_end_samples = [];
         trial_end_trigger = {};
@@ -97,6 +120,7 @@ for pp      = [1:29];
             end
         end
     end
+
     %% get to three channels
     % we only need x-axis, y-axis, & pupil from now on
     eyedata.label(2:4) = {'eyeX','eyeY','eyePupil'};
@@ -112,9 +136,14 @@ for pp      = [1:29];
         toadd1 = '_NaNtrialoverlap';
     else
         toadd1 = '';
+    
+    if nan_post_target == 1
+        toadd2 = '_NaNposttarget';
+    else
+        toadd2 = '';
     end    
 
-    save([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, '__', param.subjName], 'eyedata');
+    save([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, toadd2, '__', param.subjName], 'eyedata');
     
     %% test plot
     % figure; 
