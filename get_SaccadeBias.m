@@ -5,8 +5,10 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
-remove_unfixated = 0;
-nan_trial_overlap = 1;
+
+remove_unfixated = 1;
+nan_trial_overlap = 0;
+nan_post_target = 1;
 
 %% loop over participants
 for pp = [1:25];
@@ -16,10 +18,16 @@ for pp = [1:25];
         toadd1 = '_NaNtrialoverlap';
     else
         toadd1 = '';
-    end    
+    end
+
+    if nan_post_target == 1
+        toadd2 = '_NaNposttarget';
+    else
+        toadd2 = '';
+    end
 
     param = getSubjParam(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaMicro1', toadd1, '__', param.subjName], 'eyedata');
+    load([param.path, '\epoched_data\eyedata_AnnaMicro1', toadd1, toadd2, '__', param.subjName], 'eyedata');
 
     %% only keep channels of interest
     cfg = [];
@@ -321,7 +329,13 @@ for pp = [1:25];
         toadd2 = '';
     end    
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if nan_post_target == 1
+        toadd3 = '_NaNposttarget';
+    else
+        toadd3 = '';
+    end
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop

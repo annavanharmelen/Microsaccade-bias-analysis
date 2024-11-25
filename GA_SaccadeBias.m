@@ -5,9 +5,9 @@
 clear; clc; close all;
     
 %% parameters
-remove_unfixated = 0;
-nan_trial_overlap = 1;
-
+remove_unfixated = 1;
+nan_trial_overlap = 0;
+nan_post_target = 1;
 
 pp2do           = [2:25];
 
@@ -50,9 +50,15 @@ for pp = pp2do
         toadd2 = '_removeUnfixated';
     else
         toadd2 = '';
-    end    
+    end
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if nan_post_target == 1
+        toadd3 = '_NaNposttarget';
+    else
+        toadd3 = '';
+    end
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
@@ -118,6 +124,19 @@ end
 
 %% all subs
 if plotSinglePps
+    % plot toward and away
+    figure;
+    for sp = 1:s
+        subplot(subplot_size, subplot_size,sp);
+        hold on;
+        plot(saccade.time, squeeze(saccade_data(sp,1,:,:)));
+        plot(saccade.time, squeeze(saccade_data(sp,3,:,:)));
+        plot(xlim, [0,0], '--k');
+        xlim(xlimtoplot);
+        % ylim([-0.1 0.3]);
+        title(pp2do(sp));
+    end
+    legend(saccade.label{[1,3]});
     % plot 'effect'
     figure;
     for sp = 1:s
