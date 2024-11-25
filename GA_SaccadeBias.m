@@ -9,8 +9,7 @@ remove_unfixated = 1;
 nan_trial_overlap = 0;
 nan_post_target = 1;
 
-
-pp2do           = [1:2,5:9,11,13:24, 26:29];
+pp2do           = [2:25];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
@@ -525,7 +524,7 @@ if plotGAs
 
     %% polar histogram of separate timeframes
     time_edges = [200, 600];
-    x = 4;
+    x = 3;
     % get indices of wanted time range
     timeidx = find(abs(saccade.time - time_edges(1)) < 0.01):find(abs(saccade.time - time_edges(2)) < 0.01);
 

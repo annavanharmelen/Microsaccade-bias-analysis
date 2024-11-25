@@ -5,12 +5,13 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
+
 remove_unfixated = 1;
 nan_trial_overlap = 0;
 nan_post_target = 1;
 
 %% loop over participants
-for pp = [1:29];
+for pp = [1:25];
 
     %% load epoched data of this participant data
     if nan_trial_overlap == 1
@@ -26,7 +27,7 @@ for pp = [1:29];
     end
 
     param = getSubjParam(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, toadd2, '__', param.subjName], 'eyedata');
+    load([param.path, '\epoched_data\eyedata_AnnaMicro1', toadd1, toadd2, '__', param.subjName], 'eyedata');
 
     %% only keep channels of interest
     cfg = [];
@@ -94,7 +95,7 @@ for pp = [1:29];
     %% turn post-change data to NaN
     if remove_unfixated == 0
         behdata = readtable(param.log);
-        trial_length = behdata.static_duration();
+        trial_length = behdata.static_duration;
     end
     
     if remove_unfixated
