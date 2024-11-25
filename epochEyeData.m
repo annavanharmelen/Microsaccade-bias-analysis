@@ -136,6 +136,7 @@ for pp      = [1:29];
         toadd1 = '_NaNtrialoverlap';
     else
         toadd1 = '';
+    end
     
     if nan_post_target == 1
         toadd2 = '_NaNposttarget';
