@@ -6,7 +6,7 @@ clear; clc; close all;
 %% parameter
 plotResults = 0;
 
-remove_unfixated = 1;
+remove_unfixated = 0;
 nan_trial_overlap = 0;
 nan_post_target = 1;
 
