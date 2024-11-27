@@ -6,7 +6,7 @@ clc
 display_percentage_premature = 0;
 display_percentage_unbroken = 1;
 plot_individuals = 0;
-plot_averages = 1;
+plot_averages = 0;
 
 pp2do = [2:25, 1:2,5:9,11,13:24, 26:29];
 xlabels = string(pp2do);
@@ -258,6 +258,68 @@ if plot_averages
     % set(gcf,'position',[0,0, 700,1080])
     
     % subplot(1,2,1)
+
+    %% show diff of behavioural effect as function of SOA
+    figure;
+        subplot(1,2,1);
+        hold on
+        l1 = plot(trial_lengths, nanmean(reaction_time_per_soa_invalid) - nanmean(reaction_time_per_soa_valid), 'Color', bright_colours(3,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
+        p1 = frevede_errorbarplot(trial_lengths, (reaction_time_per_soa_invalid-reaction_time_per_soa_valid), bright_colours(3,:), 'se');
+
+        
+        if exist('stat_a') == 1
+            invalid = nanmean(accuracy_per_soa_invalid)*100
+            valid = nanmean(accuracy_per_soa_valid)*100
+            
+            for X = trial_lengths(stat_a.mask)
+                Y = find(trial_lengths == X);
+                plot([X X], [valid(Y) invalid(Y)], '--', 'Color', 'k', 'LineWidth', 2.5)
+            end
+        end
+        
+        ylim([0 400]);
+        ylabel('Time (ms)');
+        yticks([0 200 400]);
+        xlim([min(trial_lengths) max(trial_lengths)]);
+        xticks([500 1400 2300 3200]);
+        xlabel('SOA (ms)');
+        % title('Accuracy', 'fontsize', 28)
+        
+        % subplot(1,2,1);
+        xlabel('SOA (ms)');
+        % title('Response time', 'fontsize', 28)
+        fontsize(30, "points");
+
+
+        subplot(1,2,2);
+        hold on
+        
+        l2 = plot(trial_lengths, nanmean(accuracy_per_soa_valid)*100 - nanmean(accuracy_per_soa_invalid)*100, 'Color', bright_colours(3,:), 'LineWidth', 3.5, 'Marker', 'o', 'MarkerFaceColor', bright_colours(1,:));
+        p2 = frevede_errorbarplot(trial_lengths, (accuracy_per_soa_valid-accuracy_per_soa_invalid)*100, bright_colours(3,:), 'se');
+
+        
+        if exist('stat_a') == 1
+            invalid = nanmean(accuracy_per_soa_invalid)*100
+            valid = nanmean(accuracy_per_soa_valid)*100
+            
+            for X = trial_lengths(stat_a.mask)
+                Y = find(trial_lengths == X);
+                plot([X X], [valid(Y) invalid(Y)], '--', 'Color', 'k', 'LineWidth', 2.5)
+            end
+        end
+        
+        ylim([0 30]);
+        ylabel('Correct (%)');
+        yticks([0 15 30]);
+        xlim([min(trial_lengths) max(trial_lengths)]);
+        xticks([500 1400 2300 3200]);
+        xlabel('SOA (ms)');
+        % title('Accuracy', 'fontsize', 28)
+        
+        % subplot(1,2,1);
+        xlabel('SOA (ms)');
+        % title('Response time', 'fontsize', 28)
+        fontsize(30, "points");
     
 end
 
