@@ -6,7 +6,8 @@ clear; clc; close all;
     
 %% parameters
 remove_unfixated = 1;
-nan_trial_overlap = 1;
+nan_trial_overlap = 0;
+nan_post_target = 1;
 
 
 pp2do = [2:25, 1:2,5:9,11,13:24, 26:29];
@@ -56,9 +57,15 @@ for pp = pp2do
         toadd2 = '_removeUnfixated';
     else
         toadd2 = '';
-    end    
+    end
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if nan_post_target == 1
+        toadd3 = '_NaNposttarget';
+    else
+        toadd3 = ''
+    end
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
