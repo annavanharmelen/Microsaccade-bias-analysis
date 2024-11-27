@@ -227,9 +227,9 @@ if plot_averages
     end
     
     legend([l3, l4], labels, 'EdgeColor', 'w');
-    ylim([50 100]);
+    ylim([40 100]);
     ylabel('Correct (%)');
-    yticks([50 75 100]);
+    % yticks([50 75 100]);
     xlim([min(trial_lengths) max(trial_lengths)]);
     xticks([500 1400 2300 3200]);
     xlabel('SOA (ms)');
