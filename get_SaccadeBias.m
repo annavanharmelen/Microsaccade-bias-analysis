@@ -5,10 +5,11 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
-
-remove_unfixated = 0;
 nan_trial_overlap = 0;
 nan_post_target = 1;
+
+remove_unfixated = 1;
+remove_prematures = 1;
 
 %% loop over participants
 for pp = [1:25];
@@ -40,7 +41,7 @@ for pp = [1:25];
     tl = ft_timelockanalysis(cfg, eyedata); % realign the data: from trial*time cells into trial*channel*time?
     tl.time = tl.time * 1000;
 
-    %% remove premature trials
+    %% remove trials interrupted by eyetracker
     if remove_unfixated
         % get behavioural data
         behdata = readtable(getSubjParam(pp).log);
@@ -54,10 +55,27 @@ for pp = [1:25];
 
         % select trials broken after target change
         also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
-
-        % remove non-oktrials from eye-tracking data
+        
+        % remove non-oktrials from behavioural and eye-tracking data
+        behdata = behdata(logical(oktrials+also_oktrials), :);
         tl.trial = tl.trial(logical(oktrials+also_oktrials),:,:);
         tl.trialinfo = tl.trialinfo(logical(oktrials+also_oktrials),:,:);
+    end
+
+    %% remove trials with premature keyboard response
+    if remove_prematures
+        % get behavioural data
+        if remove_unfixated == 0
+            behdata = readtable(getSubjParam(pp).log);
+        end
+        
+        % select premature trials
+        oktrials = ismember(behdata.premature_pressed, {'False'});
+    
+        % remove non-oktrials from behavioural and eye-tracking data
+        behdata = behdata(logical(oktrials), :);
+        tl.trial = tl.trial(oktrials,:,:);
+        tl.trialinfo = tl.trialinfo(oktrials,:,:);
     end
 
     %% pixel to degree
@@ -93,21 +111,18 @@ for pp = [1:25];
     [shiftsX,shiftsY, peakvelocity, times] = PBlab_gazepos2shift_2D(cfg, data_input(:,chX,:), data_input(:,chY,:), time_input);
     
     %% turn post-change data to NaN
-    if remove_unfixated == 0
-        behdata = readtable(param.log);
-        trial_length = behdata.static_duration;
-    end
+    if nan_post_target
+
+        trial_lengths = behdata.static_duration;
+        
+        for trial = 1:length(trial_lengths)
+            selection = times > trial_lengths(trial);
     
-    if remove_unfixated
-        trial_length = behdata.static_duration(logical(oktrials+also_oktrials));
-    end
+            shiftsX(trial, selection) = NaN;
+            shiftsY(trial, selection) = NaN;
+            peakvelocity(trial, selection) = NaN;
+        end
 
-    for trial = 1:length(trial_length)
-        selection = times > trial_length(trial);
-
-        shiftsX(trial, selection) = NaN;
-        shiftsY(trial, selection) = NaN;
-        peakvelocity(trial, selection) = NaN;
     end
 
     %% select usable gaze shifts
@@ -175,8 +190,8 @@ for pp = [1:25];
     %% polar histogram
     % set shifts
     shifts = shiftsX+shiftsY*1i;
-    for trial = 1:length(trial_length)
-        selection = times > trial_length(trial);
+    for trial = 1:length(trial_lengths)
+        selection = times > trial_lengths(trial);
         shifts(trial, selection) = NaN;
     end
     
@@ -227,8 +242,8 @@ for pp = [1:25];
         shiftsSW = double(shiftsX<0 & shiftsY<0 & saccadeswithinrange);
         
         % NaN data after orientation change
-        for trial = 1:length(trial_length)
-            selection = times > trial_length(trial);
+        for trial = 1:length(trial_lengths)
+            selection = times > trial_lengths(trial);
             shiftsNE(trial, selection) = NaN;
             shiftsNW(trial, selection) = NaN;
             shiftsSE(trial, selection) = NaN;
@@ -251,7 +266,7 @@ for pp = [1:25];
     %% also get as function of trial length - identical as above, except for trial lengt
     saccade_lengthsplit = [];
     saccade_lengthsplit.dimord = 'chan_freq_time';
-    saccade_lengthsplit.freq = unique(trial_length)'; % trial lengths, as if "frequency axis" for time-frequency plot
+    saccade_lengthsplit.freq = unique(trial_lengths)'; % trial lengths, as if "frequency axis" for time-frequency plot
     saccade_lengthsplit.time = times;
     saccade_lengthsplit.label = saccade.label;
 
@@ -264,14 +279,14 @@ for pp = [1:25];
         shiftsSE = [];
         shiftsSW = [];
 
-        shiftsNE = double(shiftsX(trial_length == tl,:)>0 & shiftsY(trial_length == tl,:)>0);
-        shiftsNW = double(shiftsX(trial_length == tl,:)<0 & shiftsY(trial_length == tl,:)>0);
-        shiftsSE = double(shiftsX(trial_length == tl,:)>0 & shiftsY(trial_length == tl,:)<0);
-        shiftsSW = double(shiftsX(trial_length == tl,:)<0 & shiftsY(trial_length == tl,:)<0);
+        shiftsNE = double(shiftsX(trial_lengths == tl,:)>0 & shiftsY(trial_lengths == tl,:)>0);
+        shiftsNW = double(shiftsX(trial_lengths == tl,:)<0 & shiftsY(trial_lengths == tl,:)>0);
+        shiftsSE = double(shiftsX(trial_lengths == tl,:)>0 & shiftsY(trial_lengths == tl,:)<0);
+        shiftsSW = double(shiftsX(trial_lengths == tl,:)<0 & shiftsY(trial_lengths == tl,:)<0);
         
         % NaN data after orientation change
-        for trial = 1:length(trial_length)
-            selection = times > trial_length(trial);
+        for trial = 1:length(trial_lengths)
+            selection = times > trial_lengths(trial);
             shiftsNE(trial, selection) = NaN;
             shiftsNW(trial, selection) = NaN;
             shiftsSE(trial, selection) = NaN;
@@ -335,7 +350,13 @@ for pp = [1:25];
         toadd3 = '';
     end
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if remove_prematures == 1
+        toadd4 = '_removePremature';
+    else
+        toadd4 = '';
+    end
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop
