@@ -5,9 +5,11 @@
 clear; clc; close all;
     
 %% parameters
-remove_unfixated = 1;
 nan_trial_overlap = 0;
 nan_post_target = 1;
+
+remove_unfixated = 0;
+remove_prematures = 1;
 
 pp2do           = [2:25];
 
@@ -58,7 +60,14 @@ for pp = pp2do
         toadd3 = '';
     end
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if remove_prematures == 1
+        toadd4 = '_removePremature';
+    else
+        toadd4 = '';
+    end
+
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
