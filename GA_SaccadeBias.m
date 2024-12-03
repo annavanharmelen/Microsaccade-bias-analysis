@@ -107,7 +107,7 @@ for pp = pp2do
     for i = 1:size(saccadesize.data, 1)
         saccade_data(s,i,:) = saccade.data(i,:);
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
-        % saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
+        saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
     end
 
     % take average of polar hist data
