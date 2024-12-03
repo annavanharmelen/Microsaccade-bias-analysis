@@ -5,11 +5,12 @@ clear; clc; close all;
 
 %% parameter
 plotResults = 0;
-remove_unfixated = 1;
+remove_unfixated = 0;
 nan_trial_overlap = 1;
+only_over_2300 = 1;
 
 %% loop over participants
-for pp = [17:29];
+for pp = [1:25];
 
     %% load epoched data of this participant data
     if nan_trial_overlap == 1
@@ -18,8 +19,8 @@ for pp = [17:29];
         toadd1 = '';
     end    
 
-    param = getSubjParam(pp);
-    load([param.path, '\epoched_data\eyedata_AnnaMicro2', toadd1, '__', param.subjName], 'eyedata');
+    param = getSubjParam1(pp);
+    load([param.path, '\epoched_data\eyedata_AnnaMicro1', toadd1, '__', param.subjName], 'eyedata');
 
     %% only keep channels of interest
     cfg = [];
@@ -35,7 +36,7 @@ for pp = [17:29];
     %% remove premature trials
     if remove_unfixated
         % get behavioural data
-        behdata = readtable(getSubjParam(pp).log);
+        behdata = readtable(getSubjParam2(pp).log);
 
         % remove trials already not in eyedata from behavioural data
         to_remove = ismember(behdata.exit_stage, {'stimuli_onset'});
@@ -48,10 +49,25 @@ for pp = [17:29];
         also_oktrials = ismember(behdata.exit_stage, {'orientation_change'});
 
         % remove non-oktrials from eye-tracking data
+        behdata = behdata(logical(oktrials+also_oktrials), :);
         tl.trial = tl.trial(logical(oktrials+also_oktrials),:,:);
         tl.trialinfo = tl.trialinfo(logical(oktrials+also_oktrials),:,:);
     end
 
+    %% select only trials of min 2300 ms long
+    if only_over_2300
+        % load data if necessary
+        if remove_unfixated == 0
+            behdata = readtable(getSubjParam1(pp).log);
+        end
+        
+        % keep only trials of min 2300 ms long
+        to_keep = behdata.static_duration>=2300;
+
+        behdata = behdata(logical(to_keep), :);
+        tl.trial = tl.trial(logical(to_keep),:,:);
+        tl.trialinfo = tl.trialinfo(logical(to_keep),:,:);
+    end
     %% pixel to degree
     [dva_x, dva_y] = frevede_pixel2dva(squeeze(tl.trial(:,1,:)), squeeze(tl.trial(:,2,:)));
     tl.trial(:,1,:) = dva_x;
@@ -87,12 +103,9 @@ for pp = [17:29];
     %% turn post-change data to NaN
     if remove_unfixated == 0
         behdata = readtable(param.log);
-        trial_length = behdata.static_duration();
     end
-    
-    if remove_unfixated
-        trial_length = behdata.static_duration(logical(oktrials+also_oktrials));
-    end
+
+    trial_length = behdata.static_duration;
 
     for trial = 1:length(trial_length)
         selection = times > trial_length(trial);
@@ -320,8 +333,14 @@ for pp = [17:29];
     else
         toadd2 = '';
     end    
+    
+    if only_over_2300 ==1
+        toadd3 = '_over2300';
+    else
+        toadd3 = '';
+    end
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop
