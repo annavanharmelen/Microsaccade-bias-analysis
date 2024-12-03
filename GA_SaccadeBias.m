@@ -8,7 +8,7 @@ clear; clc; close all;
 nan_trial_overlap = 0;
 nan_post_target = 1;
 
-remove_unfixated = 0;
+remove_unfixated = 1;
 remove_prematures = 1;
 
 pp2do           = [2:25];
