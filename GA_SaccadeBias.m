@@ -5,11 +5,12 @@
 clear; clc; close all;
     
 %% parameters
-nan_trial_overlap = 0;
-nan_post_target = 1;
+nan_trial_overlap = 1;
+nan_post_target = 0;
 
 remove_unfixated = 1; %note: this only adds it to m2 pp's
-remove_prematures = 1;
+remove_prematures = 0;
+only_over_2300 = 1;
 
 
 pp2do = [2:25, 1:2,5:9,11,13:24, 26:29];
@@ -73,7 +74,13 @@ for pp = pp2do
         toadd4 = '';
     end
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if only_over_2300 ==1
+        toadd5 = '_over2300';
+    else
+        toadd5 = '';
+    end
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
@@ -100,7 +107,7 @@ for pp = pp2do
     for i = 1:size(saccadesize.data, 1)
         saccade_data(s,i,:) = saccade.data(i,:);
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
-        saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
+        % saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
     end
 
     % take average of polar hist data
