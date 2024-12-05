@@ -9,14 +9,14 @@ nan_post_target = 1;
 
 remove_unfixated = 0;
 remove_prematures = 1;
-only_over_2000 = 1;
+only_over_2000 = 0;
 
 pp2do           = [2:25];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
 plotGAs         = 1;
-xlimtoplot      = [-500 2000];
+xlimtoplot      = [-500 3200];
 
 %% predefine size of some matrices
 shiftsL = NaN(size(pp2do, 2), 400, 3550);
