@@ -80,7 +80,7 @@ for pp = pp2do
     avg_saccade_effect(s, 3) = mean(saccade.data(5,:));
 
     avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
-    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=2000) - saccade.data(6,saccade.time>=1000 & saccade.time<=2000));
+    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000) - saccade.data(6,saccade.time>=1000 & saccade.time<=3000));
     % smooth?
     if nsmooth > 0
         for i = 1:size(saccade.data,1)
