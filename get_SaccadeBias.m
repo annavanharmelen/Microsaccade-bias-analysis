@@ -79,7 +79,7 @@ for pp = [2:29];
         tl.trialinfo = tl.trialinfo(oktrials,:,:);
     end
     
-    %% select only trials of min 2300 ms long
+    %% select only trials of min 2000 ms long
     if only_over_2000
         % load data if necessary
         if remove_unfixated == 0 & remove_prematures == 0
