@@ -10,9 +10,10 @@ nan_post_target = 1;
 
 remove_unfixated = 1;
 remove_prematures = 1;
+only_over_2000 = 1;
 
 %% loop over participants
-for pp = [1:29];
+for pp = [2:29];
 
     %% load epoched data of this participant data
     if nan_trial_overlap == 1
@@ -76,6 +77,21 @@ for pp = [1:29];
         behdata = behdata(logical(oktrials), :);
         tl.trial = tl.trial(oktrials,:,:);
         tl.trialinfo = tl.trialinfo(oktrials,:,:);
+    end
+    
+    %% select only trials of min 2300 ms long
+    if only_over_2000
+        % load data if necessary
+        if remove_unfixated == 0 & remove_prematures == 0
+            behdata = readtable(getSubjParam(pp).log);
+        end
+        
+        % keep only trials of min 2000 ms long
+        to_keep = behdata.static_duration>=2000;
+        
+        behdata = behdata(logical(to_keep), :);
+        tl.trial = tl.trial(logical(to_keep),:,:);
+        tl.trialinfo = tl.trialinfo(logical(to_keep),:,:);
     end
 
     %% pixel to degree
@@ -356,7 +372,13 @@ for pp = [1:29];
         toadd4 = '';
     end
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if only_over_2000 == 1
+        toadd5 = '_onlyover2000';
+    else
+        toadd5 = '';
+    end
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop
