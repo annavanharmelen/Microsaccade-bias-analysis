@@ -8,8 +8,9 @@ plotResults = 0;
 nan_trial_overlap = 0;
 nan_post_target = 1;
 
-remove_unfixated = 1;
+remove_unfixated = 0;
 remove_prematures = 1;
+only_over_2000 = 1;
 
 %% loop over participants
 for pp = [1:25];
@@ -53,6 +54,21 @@ for pp = [1:25];
         behdata = behdata(logical(oktrials), :);
         tl.trial = tl.trial(oktrials,:,:);
         tl.trialinfo = tl.trialinfo(oktrials,:,:);
+    end
+    
+    %% select only trials of min 2000 ms long
+    if only_over_2000
+        % load data if necessary
+        if remove_prematures == 0
+            behdata = readtable(getSubjParam(pp).log);
+        end
+        
+        % keep only trials of min 2000 ms long
+        to_keep = behdata.static_duration>=2000;
+        
+        behdata = behdata(logical(to_keep), :);
+        tl.trial = tl.trial(logical(to_keep),:,:);
+        tl.trialinfo = tl.trialinfo(logical(to_keep),:,:);
     end
 
     %% pixel to degree
@@ -122,7 +138,7 @@ for pp = [1:25];
     if nan_post_target
 
         trial_lengths = behdata.static_duration;
-
+        
         for trial = 1:length(trial_lengths)
             selection = times > trial_lengths(trial);
     
@@ -155,20 +171,20 @@ for pp = [1:25];
     saccade.data(3,:) = (mean(shiftsSW(cueR&sel,:), "omitnan") + mean(shiftsSE(cueL&sel,:), "omitnan")) ./ 2;
     saccade.data(4,:) = (mean(shiftsNE(cueR&sel,:), "omitnan") + mean(shiftsNW(cueL&sel,:), "omitnan")) ./ 2;
     saccade.data(5,:) = (saccade.data(1,:) - saccade.data(3,:)) / 2;
-
+    
     % add aggregated fields
     saccade.data(6,:) = (saccade.data(1,:) + saccade.data(2,:)) / 2;
     saccade.data(7,:) = (saccade.data(3,:) + saccade.data(4,:)) / 2;
     saccade.data(8,:) = (saccade.data(6,:) - saccade.data(7,:)) / 2;
 
-
+    
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
-
+    
     for i = 1:size(saccade.label, 2)
         saccade.data(i,:,:) = smoothdata(saccade.data(i,:,:), 2, 'movmean', integrationwindow)*1000;
     end
-    
+       
     %% plot
     if plotResults
         figure; 
@@ -184,7 +200,7 @@ for pp = [1:25];
         plot(saccade.time, saccade.data(5,:,:), 'r');
         plot(saccade.time, saccade.data(6,:,:), 'b');
         hold off
-
+        
         figure;
         plot(saccade.time, saccade.data(7,:,:), 'k');
 
@@ -202,7 +218,7 @@ for pp = [1:25];
         selection = times > trial_lengths(trial);
         shifts(trial, selection) = NaN;
     end
-
+    
     saccadedirection = [];
     saccadedirection.shiftsL = shifts(cueL, :);
     saccadedirection.shiftsR = shifts(cueR, :);
@@ -236,7 +252,7 @@ for pp = [1:25];
     c = 0;
     for sz = saccadesize.freq;
         c = c+1;
-
+        
         shiftsNE = [];
         shiftsNW = [];
         shiftsSE = [];
@@ -248,7 +264,7 @@ for pp = [1:25];
         shiftsNW = double(shiftsX<0 & shiftsY>0 & saccadeswithinrange);
         shiftsSE = double(shiftsX>0 & shiftsY<0 & saccadeswithinrange);
         shiftsSW = double(shiftsX<0 & shiftsY<0 & saccadeswithinrange);
-
+        
         % NaN data after orientation change
         for trial = 1:length(trial_lengths)
             selection = times > trial_lengths(trial);
@@ -263,14 +279,14 @@ for pp = [1:25];
         saccadesize.data(3,c,:) = (mean(shiftsSW(cueR,:), "omitnan") + mean(shiftsSE(cueL,:), "omitnan")) ./ 2;
         saccadesize.data(4,c,:) = (mean(shiftsNE(cueR,:), "omitnan") + mean(shiftsNW(cueL,:), "omitnan")) ./ 2;
         saccadesize.data(5,c,:) = (saccadesize.data(1,c,:) - saccadesize.data(3,c,:)) ./ 2;
-
+        
         % add aggregated fields
         saccadesize.data(6,c,:) = (saccadesize.data(1,c,:) + saccadesize.data(2,c,:)) ./ 2;
         saccadesize.data(7,c,:) = (saccadesize.data(3,c,:) + saccadesize.data(4,c,:)) ./ 2;
         saccadesize.data(8,c,:) = (saccadesize.data(6,c,:) - saccadesize.data(7,c,:)) ./ 2;
-
+    
     end
-
+   
     %% also get as function of trial length - identical as above, except for trial lengt
     saccade_lengthsplit = [];
     saccade_lengthsplit.dimord = 'chan_freq_time';
@@ -281,7 +297,7 @@ for pp = [1:25];
     c = 0;
     for tl = saccade_lengthsplit.freq;
         c = c+1;
-
+        
         shiftsNE = [];
         shiftsNW = [];
         shiftsSE = [];
@@ -291,7 +307,7 @@ for pp = [1:25];
         shiftsNW = double(shiftsX(trial_lengths == tl,:)<0 & shiftsY(trial_lengths == tl,:)>0);
         shiftsSE = double(shiftsX(trial_lengths == tl,:)>0 & shiftsY(trial_lengths == tl,:)<0);
         shiftsSW = double(shiftsX(trial_lengths == tl,:)<0 & shiftsY(trial_lengths == tl,:)<0);
-
+        
         % NaN data after orientation change
         for trial = 1:length(trial_lengths)
             selection = times > trial_lengths(trial);
@@ -306,22 +322,22 @@ for pp = [1:25];
         saccade_lengthsplit.data(3,c,:) = (mean(shiftsSW(cueR,:), "omitnan") + mean(shiftsSE(cueL,:), "omitnan")) ./ 2;
         saccade_lengthsplit.data(4,c,:) = (mean(shiftsNE(cueR,:), "omitnan") + mean(shiftsNW(cueL,:), "omitnan")) ./ 2;
         saccade_lengthsplit.data(5,c,:) = (saccade_lengthsplit.data(1,c,:) - saccade_lengthsplit.data(3,c,:)) ./ 2;
-
+        
         % add aggregated fields
         saccade_lengthsplit.data(6,c,:) = (saccade_lengthsplit.data(1,c,:) + saccade_lengthsplit.data(2,c,:)) ./ 2;
         saccade_lengthsplit.data(7,c,:) = (saccade_lengthsplit.data(3,c,:) + saccade_lengthsplit.data(4,c,:)) ./ 2;
         saccade_lengthsplit.data(8,c,:) = (saccade_lengthsplit.data(6,c,:) - saccade_lengthsplit.data(7,c,:)) ./ 2;
-
+    
     end
 
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
-
+   
     for i = 1:size(saccade.label, 2)
         saccadesize.data(i,:,:) = smoothdata(saccadesize.data(i,:,:), 3, 'movmean', integrationwindow)*1000;
         saccade_lengthsplit.data(i,:,:) = smoothdata(saccade_lengthsplit.data(i,:,:), 3, 'movmean', integrationwindow)*1000;
     end
-
+    
     %% plot results
     if plotResults
         cfg = [];
@@ -339,9 +355,6 @@ for pp = [1:25];
     end
 
     %% save
-    % save trials to file that were used for the final analysis
-    included_trials = behdata.trial_number(usable_trials);
-
     % depending on this option, append to name of saved file. 
     if nan_trial_overlap == 1
         toadd1 = '_NaNtrialoverlap';
@@ -367,7 +380,13 @@ for pp = [1:25];
         toadd4 = '';
     end
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit', 'included_trials');
+    if only_over_2000 == 1
+        toadd5 = '_onlyover2000';
+    else
+        toadd5 = '';
+    end
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
 
     %% close loops
 end % end pp loop

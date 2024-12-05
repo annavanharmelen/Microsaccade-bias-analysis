@@ -1,4 +1,3 @@
-
 %% Step3b--grand average plots of gaze-shift (saccade) results
 
 %% start clean
@@ -10,13 +9,14 @@ nan_post_target = 1;
 
 remove_unfixated = 0;
 remove_prematures = 1;
+only_over_2000 = 1;
 
 pp2do           = [2:25];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
-plotGAs         = 0;
-xlimtoplot      = [-500 3200];
+plotGAs         = 1;
+xlimtoplot      = [-500 2000];
 
 %% predefine size of some matrices
 shiftsL = NaN(size(pp2do, 2), 400, 3550);
@@ -59,15 +59,20 @@ for pp = pp2do
     else
         toadd3 = '';
     end
-
+    
     if remove_prematures == 1
         toadd4 = '_removePremature';
     else
         toadd4 = '';
     end
 
+    if only_over_2000 == 1
+        toadd5 = '_onlyover2000';
+    else
+        toadd5 = '';
+    end
 
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
@@ -75,7 +80,7 @@ for pp = pp2do
     avg_saccade_effect(s, 3) = mean(saccade.data(5,:));
 
     avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
-    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000) - saccade.data(6,saccade.time>=1000 & saccade.time<=3000));
+    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=2000) - saccade.data(6,saccade.time>=1000 & saccade.time<=2000));
     % smooth?
     if nsmooth > 0
         for i = 1:size(saccade.data,1)
@@ -242,7 +247,7 @@ if plotGAs
     p7 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,5,:)), bright_colours(3,:), 'se');
     p7.LineWidth = 2.5;
     fontsize(23, 'points')
-    xlim([-500, 3100]);
+    xlim(xlimtoplot);
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     % legend([p7], 'effect', 'EdgeColor', 'w', 'Fontsize', 28);
@@ -257,7 +262,7 @@ if plotGAs
     hold on
     plot(saccade.time, squeeze(saccade_data(:,5,:)));
     % fontsize(23, 'points')
-    xlim([-500, 3100]);
+    xlim(xlimtoplot);
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     % legend([p7], 'effect', 'EdgeColor', 'w', 'Fontsize', 28);
@@ -275,7 +280,7 @@ if plotGAs
     p8.LineWidth = 2.5;
     p9.LineWidth = 2.5;
     fontsize(23, 'points')
-    xlim([-500, 3100]);
+    xlim(xlimtoplot);
     % plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     legend([p8, p9], {'target', 'nontarget'}, 'EdgeColor', 'w', 'Fontsize', 28);
@@ -330,7 +335,7 @@ if plotGAs
     plot([-500 2300], [5, 5], '--', 'LineWidth',2, 'Color', [0,68,27]/255);
     plot([-500 2300], [3.73, 3.73], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([-500 1400], [1, 1], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    xlim([-450, 3050]);
+    xlim(xlimtoplot);
     ylim([0.25 5.5]);
     title('', 'FontSize', 39);
     fontsize(39,"points");
@@ -356,7 +361,7 @@ if plotGAs
     zticks([]);
     hold on
     set(gcf,'position',[0,0, 1800, 750])
-    xlim([-450, 3050]);
+    xlim(xlimtoplot);
     % ylim([0.25 5.5]);
     title('', 'FontSize', 39);
     fontsize(39,"points");
@@ -533,7 +538,7 @@ if plotGAs
 
     %% polar histogram of separate timeframes
     time_edges = [200, 600];
-    x = 3;
+    x = 4;
     % get indices of wanted time range
     timeidx = find(abs(saccade.time - time_edges(1)) < 0.01):find(abs(saccade.time - time_edges(2)) < 0.01);
 
