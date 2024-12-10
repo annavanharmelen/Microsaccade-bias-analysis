@@ -248,6 +248,8 @@ if plotGAs
     p7.LineWidth = 2.5;
     fontsize(23, 'points')
     xlim(xlimtoplot);
+    ylim([-0.02 0.06]);
+    yticks([0 0.05]);
     plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     % legend([p7], 'effect', 'EdgeColor', 'w', 'Fontsize', 28);
@@ -281,10 +283,12 @@ if plotGAs
     p9.LineWidth = 2.5;
     fontsize(23, 'points')
     xlim(xlimtoplot);
+    ylim([0 0.25]);
+    yticks([0.1, 0.2]);
     % plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     legend([p8, p9], {'target', 'nontarget'}, 'EdgeColor', 'w', 'Fontsize', 28);
-    ylabel('Rate (Hz)', 'Fontsize', 28);
+    ylabel('Saccade bias (Hz)', 'Fontsize', 28);
     xlabel('Time (ms)', 'Fontsize', 28);
     set(gcf,'position',[0,0, 1800,900])
     hold off
@@ -332,16 +336,16 @@ if plotGAs
     hold on
     set(gcf,'position',[0,0, 1800, 750])
     plot([0,0], [0, 7], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    plot([-500 2300], [5, 5], '--', 'LineWidth',2, 'Color', [0,68,27]/255);
-    plot([-500 2300], [3.73, 3.73], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    plot([-500 1080], [5, 5], '--', 'LineWidth',2, 'Color', [0,68,27]/255);
+    plot([-500 1080], [3.73, 3.73], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([-500 1400], [1, 1], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     xlim(xlimtoplot);
     ylim([0.25 5.5]);
     title('', 'FontSize', 39);
     fontsize(39,"points");
-    text(2420, 5.025, 'Centre', 'FontSize', 34, 'Color', [0,68,27]/255);
-    text(2420, 3.755, 'Border', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
-    text(1520, 1, 'Microsaccade range', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
+    text(1120, 5.025, 'Centre', 'FontSize', 34, 'Color', [0,68,27]/255);
+    text(1120, 3.755, 'Border', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
+    % text(1520, 1, 'Microsaccade range', 'FontSize', 34, 'Color',[0.6, 0.6, 0.6]);
     
     
     %% just effect as function of SOA
