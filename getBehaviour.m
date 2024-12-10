@@ -6,7 +6,7 @@ clc
 display_percentage_premature = 0;
 display_percentage_unbroken = 1;
 plot_individuals = 0;
-plot_averages = 1;
+plot_averages = 0;
 
 pp2do = [2:25];
 p = 0;
@@ -274,6 +274,13 @@ if plot_averages
     % errorbar([2], [nanmean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', light_colours(1,:));
     errorbar([2], [nanmean(error_validity(:,2))*100], [(std(error_validity(:,2)) ./ sqrt(p))*100], 'LineWidth', 3, 'Color', dark_colours(2,:));
     plot([1,2], [error_validity(:,1:2)*100]', 'Color', [0, 0, 0, 0.25], 'LineWidth', 1);
+    
+    % add significant differences to line plot
+    acc_p = [];
+    for soa = 1:size(reaction_time_per_soa_valid, 2)
+        [h, p_val, ci, stats] = ttest(accuracy_per_soa_valid(:, soa), accuracy_per_soa_invalid(:, soa));
+        acc_p(soa) = p_val;
+    end
     
     % legend(labels, 'Location', 'southeast');
     ylim(acc_y_lim);
