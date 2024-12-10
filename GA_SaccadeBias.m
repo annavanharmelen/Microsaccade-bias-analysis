@@ -9,7 +9,7 @@ nan_post_target = 1;
 
 remove_unfixated = 0;
 remove_prematures = 1;
-only_over_1400 = 0;
+only_over_1400 = 1;
 
 pp2do           = [2:25];
 
