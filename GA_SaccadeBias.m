@@ -16,7 +16,7 @@ pp2do           = [1:2,5:9,11,13:24, 26:29];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
-plotGAs         = 1;
+plotGAs         = 0;
 xlimtoplot      = [-100 1400];
 
 %% predefine size of some matrices
@@ -531,9 +531,9 @@ if plotGAs
 
     % title('Saccade towards rate')
     % legend(labels, 'Location', 'southeast');
-    % ylim([-0.03 0.26]);
+    ylim([-0.03 0.15]);
     ylabel('Saccade bias (ΔHz)');
-    % yticks([0 0.1 0.2]);
+    yticks([0 0.1 0.2]);
     xlim([0.3 2.7]);
     xticks([1,2]);
     xticklabels({'Shift', 'Sustain'});
