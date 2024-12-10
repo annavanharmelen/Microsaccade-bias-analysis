@@ -9,14 +9,14 @@ nan_post_target = 1;
 
 remove_unfixated = 0;
 remove_prematures = 1;
-only_over_2000 = 0;
+only_over_1400 = 0;
 
 pp2do           = [2:25];
 
 nsmooth         = 500;
 plotSinglePps   = 0;
 plotGAs         = 1;
-xlimtoplot      = [-500 3200];
+xlimtoplot      = [-100 1400];
 
 %% predefine size of some matrices
 shiftsL = NaN(size(pp2do, 2), 400, 3550);
@@ -66,8 +66,8 @@ for pp = pp2do
         toadd4 = '';
     end
 
-    if only_over_2000 == 1
-        toadd5 = '_onlyover2000';
+    if only_over_1400 == 1
+        toadd5 = '_onlyover1400';
     else
         toadd5 = '';
     end
@@ -80,7 +80,7 @@ for pp = pp2do
     avg_saccade_effect(s, 3) = mean(saccade.data(5,:));
 
     avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
-    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=3000) - saccade.data(6,saccade.time>=1000 & saccade.time<=3000));
+    avg_saccade_axis_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=1400) - saccade.data(6,saccade.time>=1000 & saccade.time<=1400));
     % smooth?
     if nsmooth > 0
         for i = 1:size(saccade.data,1)
