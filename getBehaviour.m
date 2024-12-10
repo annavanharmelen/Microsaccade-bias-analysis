@@ -275,6 +275,13 @@ if plot_averages
     
     % set(gcf,'position',[0,0, 700,1080])
     
+    % add significant differences to line plot
+    acc_p = [];
+    for soa = 1:size(reaction_time_per_soa_valid, 2)
+        [h, p_val, ci, stats] = ttest(accuracy_per_soa_valid(:, soa), accuracy_per_soa_invalid(:, soa));
+        acc_p(soa) = p_val;
+    end
+
     % add grand average bar graphs of data as function of validity
     subplot(1,2,2)
     hold on
