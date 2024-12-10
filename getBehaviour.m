@@ -92,16 +92,16 @@ for pp = pp2do
 
     labels = {'valid','invalid'};
     
-    reaction_time_validity(p,1) = nanmean(behdata.response_time_in_ms(valid_trials));
-    reaction_time_validity(p,2) = nanmean(behdata.response_time_in_ms(invalid_trials));
+    reaction_time_validity(p,1) = nanmean(behdata.response_time_in_ms(valid_trials&oktrials));
+    reaction_time_validity(p,2) = nanmean(behdata.response_time_in_ms(invalid_trials&oktrials));
     
-    error_validity(p,1)      = nanmean(correct_trials(valid_trials));
-    error_validity(p,2)      = nanmean(correct_trials(invalid_trials));
+    error_validity(p,1)      = nanmean(correct_trials(valid_trials&oktrials));
+    error_validity(p,2)      = nanmean(correct_trials(invalid_trials&oktrials));
         
     %% get reaction time as function of SOA
     for i = 1:size(trial_lengths, 2)
-        reaction_time_per_soa_valid(p,i) = nanmean(behdata.response_time_in_ms(valid_trials&behdata.static_duration==trial_lengths(i)));
-        reaction_time_per_soa_invalid(p,i) = nanmean(behdata.response_time_in_ms(invalid_trials&behdata.static_duration==trial_lengths(i)));
+        reaction_time_per_soa_valid(p,i) = nanmean(behdata.response_time_in_ms(valid_trials&oktrials&behdata.static_duration==trial_lengths(i)));
+        reaction_time_per_soa_invalid(p,i) = nanmean(behdata.response_time_in_ms(invalid_trials&oktrials&behdata.static_duration==trial_lengths(i)));
     end
     
     if plot_individuals
@@ -126,8 +126,8 @@ for pp = pp2do
     
     %% get accuracy as function of SOA
     for i = 1:size(trial_lengths, 2)
-        accuracy_per_soa_valid(p,i) = nanmean(correct_trials(valid_trials&behdata.static_duration==trial_lengths(i)));
-        accuracy_per_soa_invalid(p,i) = nanmean(correct_trials(invalid_trials&behdata.static_duration==trial_lengths(i)));
+        accuracy_per_soa_valid(p,i) = nanmean(correct_trials(valid_trials&oktrials&behdata.static_duration==trial_lengths(i)));
+        accuracy_per_soa_invalid(p,i) = nanmean(correct_trials(invalid_trials&oktrials&behdata.static_duration==trial_lengths(i)));
     end
     
     if plot_individuals
