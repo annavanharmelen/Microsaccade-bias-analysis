@@ -1,6 +1,6 @@
 %% Bar stats
-[h,p,i,stats] = ttest(error_validity(:,1), error_validity(:,2))
 [h,p,i,stats] = ttest(reaction_time_validity(:,1), reaction_time_validity(:,2))
+[h,p,i,stats] = ttest(error_validity(:,1), error_validity(:,2))
 
 %% SOA stats
 statcfg.xax = trial_lengths;
