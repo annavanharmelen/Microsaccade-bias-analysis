@@ -77,7 +77,7 @@ for pp = pp2do
     
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
-    avg_saccade_effect(s, 2) = mean(saccade.data(5,saccade.time>=1000 & saccade.time<=1400));
+    avg_saccade_effect(s, 2) = mean(saccade.data(5,saccade.time>=600 & saccade.time<=1400));
     avg_saccade_effect(s, 3) = mean(saccade.data(5,:));
 
     avg_saccade_axis_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600) - saccade.data(6,saccade.time>=200 & saccade.time<=600));
