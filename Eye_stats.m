@@ -3,7 +3,7 @@
 % by Anna, 04-07-2023
 %% Saccade bias data - stats
 statcfg.xax = saccade.time;
-statcfg.npermutations = 1000;
+statcfg.npermutations = 10000;
 statcfg.clusterStatEvalaluationAlpha = 0.05;
 statcfg.nsub = s;
 statcfg.statMethod = 'montecarlo';
