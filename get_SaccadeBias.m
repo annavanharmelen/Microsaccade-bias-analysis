@@ -10,7 +10,7 @@ nan_post_target = 1;
 
 remove_unfixated = 1;
 remove_prematures = 1;
-only_over_2000 = 1;
+only_over_1400 = 1;
 
 %% loop over participants
 for pp = [2:29];
@@ -79,15 +79,15 @@ for pp = [2:29];
         tl.trialinfo = tl.trialinfo(oktrials,:,:);
     end
     
-    %% select only trials of min 2000 ms long
-    if only_over_2000
+    %% select only trials of min 1400 ms long
+    if only_over_1400
         % load data if necessary
         if remove_unfixated == 0 & remove_prematures == 0
             behdata = readtable(getSubjParam(pp).log);
         end
         
-        % keep only trials of min 2000 ms long
-        to_keep = behdata.static_duration>=2000;
+        % keep only trials of min 1400 ms long
+        to_keep = behdata.static_duration>=1400;
         
         behdata = behdata(logical(to_keep), :);
         tl.trial = tl.trial(logical(to_keep),:,:);
@@ -372,8 +372,8 @@ for pp = [2:29];
         toadd4 = '';
     end
 
-    if only_over_2000 == 1
-        toadd5 = '_onlyover2000';
+    if only_over_1400 == 1
+        toadd5 = '_onlyover1400';
     else
         toadd5 = '';
     end
