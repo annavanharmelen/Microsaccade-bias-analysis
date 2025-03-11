@@ -9,7 +9,7 @@ nan_post_target = 1;
 
 remove_unfixated = 0;
 remove_prematures = 1;
-only_over_1400 = 1;
+only_under_1dva = 1;
 
 pp2do           = [2:25];
 
@@ -71,9 +71,15 @@ for pp = pp2do
     else
         toadd5 = '';
     end
-
-    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
     
+    if only_under_1dva == 1
+        toadd6 = '_onlyunder1dva';
+    else
+        toadd6 = '';
+    end
+
+    load([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, toadd6, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+
     % save averages (saccade effect (capture cue effect and probe cue reaction)
     avg_saccade_effect(s, 1) = mean(saccade.data(5,saccade.time>=200 & saccade.time<=600));
     avg_saccade_effect(s, 2) = mean(saccade.data(5,saccade.time>=600 & saccade.time<=1400));

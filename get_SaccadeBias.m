@@ -12,6 +12,8 @@ remove_unfixated = 0;
 remove_prematures = 1;
 only_over_1400 = 0;
 
+only_under_1dva = 1;
+
 %% loop over participants
 for pp = [1:25];
 
@@ -151,7 +153,12 @@ for pp = [1:25];
 
     %% select usable gaze shifts
     minDisplacement = 0;
-    maxDisplacement = 1000;
+    
+    if only_under_1dva == 1
+        maxDisplacement = 1;
+    else
+        maxDisplacement = 1000;
+    end
 
     saccadesizes = abs(shiftsX+shiftsY*1i);
 
@@ -243,9 +250,15 @@ for pp = [1:25];
     binsize = 0.5;
     halfbin = binsize/2;
 
+    if only_under_1dva == 1
+        maxdva = 1;
+    else
+        maxdva = 7;
+    end
+
     saccadesize = [];
     saccadesize.dimord = 'chan_freq_time';
-    saccadesize.freq = halfbin:0.1:7-halfbin; % shift sizes, as if "frequency axis" for time-frequency plot
+    saccadesize.freq = halfbin:0.1:maxdva-halfbin; % shift sizes, as if "frequency axis" for time-frequency plot
     saccadesize.time = times;
     saccadesize.label = saccade.label;
 
@@ -386,7 +399,14 @@ for pp = [1:25];
         toadd5 = '';
     end
 
-    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+    if only_under_1dva == 1
+        toadd6 = '_onlyunder1dva';
+    else
+        toadd6 = '';
+    end
+
+    save([param.path, '\saved_data\saccadeEffects_4D', toadd1, toadd2, toadd3, toadd4, toadd5, toadd6, '__', param.subjName], 'saccade', 'saccadedirection','saccadesize', 'saccade_lengthsplit');
+
 
     %% close loops
 end % end pp loop
