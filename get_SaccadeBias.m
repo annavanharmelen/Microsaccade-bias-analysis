@@ -104,7 +104,7 @@ for pp = [1:25];
     [shiftsX,shiftsY, peakvelocity, times] = PBlab_gazepos2shift_2D(cfg, data_input(:,chX,:), data_input(:,chY,:), time_input);
     
     %% remove trials with saccades > 2 dva
-    % (note: for m1 this option removes trials interrupted by eyetracker)
+    % (note: for m2 this option removes trials interrupted by eyetracker)
     if remove_unfixated
         % select all acceptable saccades (saccades < 2 dva)
         selection = sqrt(shiftsX.^2 + shiftsY.^2) < 2;
