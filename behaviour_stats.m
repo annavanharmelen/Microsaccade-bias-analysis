@@ -66,10 +66,14 @@ fontsize(39, 'points');
 set(gcf,'position',[0,0, 850, 800]);
 
 %% Correlation stats
-[r, p] = corr(-rt_effect, avg_saccade_effect(:,3))
+[r, p] = corr(-rt_effect, avg_saccade_effect(:,3));
+disp(['Pearson, RT: ', sprintf('r=%f ', r), sprintf('p=%f', p)]);
 
-[r, p] = corr(acc_effect, avg_saccade_effect(:,3))
+[r, p] = corr(acc_effect, avg_saccade_effect(:,3));
+disp(['Pearson, ACC: ', sprintf('r=%f ', r), sprintf('p=%f', p)]);
 
-[r, p] = corr(rt_effect, avg_saccade_effect(:,3), 'Type', 'Spearman')
+[r, p] = corr(rt_effect, avg_saccade_effect(:,3), 'Type', 'Spearman');
+disp(['Spearman, RT: ', sprintf('r=%f ', r), sprintf('p=%f', p)]);
 
-[r, p] = corr(acc_effect, avg_saccade_effect(:,3), 'Type', 'Spearman')
+[r, p] = corr(acc_effect, avg_saccade_effect(:,3), 'Type', 'Spearman');
+disp(['Spearman, ACC: ', sprintf('r=%f ', r), sprintf('p=%f', p)]);
