@@ -74,5 +74,5 @@ ylabel('Saccade bias (ΔHz)', 'Position', [-892.5697 0.1250 -1]);
 xlabel('Time (ms)');
 set(gcf,'position',[0,0, 2000,900])
 fontsize(ft_size*1.5,"points")
-legend([p1,p2], {'Target', 'Non-target'}, 'EdgeColor', 'w', 'Location', 'northeast');
+legend([p1,p2], {'Cued', 'Other'}, 'EdgeColor', 'w', 'Location', 'northeast');
 

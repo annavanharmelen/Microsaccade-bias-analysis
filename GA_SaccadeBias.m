@@ -295,7 +295,7 @@ if plotGAs
     yticks([0.1, 0.2]);
     % plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    legend([p8, p9], {'target', 'nontarget'}, 'EdgeColor', 'w', 'Fontsize', 28);
+    legend([p8, p9], {'Cued', 'Other'}, 'EdgeColor', 'w', 'Fontsize', 28);
     ylabel('Saccade bias (Hz)', 'Fontsize', 28);
     xlabel('Time (ms)', 'Fontsize', 28);
     set(gcf,'position',[0,0, 1800,900])
