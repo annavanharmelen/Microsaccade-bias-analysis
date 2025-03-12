@@ -97,8 +97,11 @@ for pp = pp2do
     end
 
     % put timecourses into matrix, with pp as first dimension
-    for i = 1:size(saccadesize.data, 1)
+    for i = 1:size(saccade.data, 1)
         saccade_data(s,i,:) = saccade.data(i,:);
+    end
+
+    for i = 1:size(saccadesize.data, 1)
         saccadesizes.data(s,i,:,:) = saccadesize.data(i,:,:);
         saccade_lengths.data(s,i,:,:) = saccade_lengthsplit.data(i,:,:);
     end
@@ -292,6 +295,28 @@ if plotGAs
     ylabel('Saccade bias (Hz)', 'Fontsize', 28);
     xlabel('Time (ms)', 'Fontsize', 28);
     set(gcf,'position',[0,0, 1800,900])
+    hold off
+    
+    % plot correct vs. incorrect
+    figure;
+    hold on
+    p10 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,11,:)), colours(1,:), 'se');
+    p11 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,14,:)), 'b', 'se');
+    legend([p10, p11], {'correct', 'incorrect'});
+    xlim(xlimtoplot);
+    ylabel('Rate (Hz)');
+    xlabel('Time (ms)');
+    hold off
+
+    % plot fast vs. slow
+    figure;
+    hold on
+    p12 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,17,:)), colours(1,:), 'se');
+    p13 = frevede_errorbarplot(saccade.time, squeeze(saccade_data(:,20,:)), 'b', 'se');
+    legend([p12, p13], {'fast', 'slow'});
+    xlim(xlimtoplot);
+    ylabel('Rate (Hz)');
+    xlabel('Time (ms)');
     hold off
     
     %% as function of saccade size

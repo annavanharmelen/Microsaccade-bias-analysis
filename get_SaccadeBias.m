@@ -114,6 +114,14 @@ for pp = [2:29];
     % validity
     valid = ismember(tl.trialinfo(:,1), [22,24,26,28]);
     invalid = ismember(tl.trialinfo(:,1), [21,23,25,27]);
+
+    % response accuracy
+    correct = ismember(behdata.feedback, {'correct'});
+    incorrect = ismember(behdata.feedback, {'incorrect'});
+
+    % response speed
+    fast = logical(behdata.response_time_in_ms < median(behdata.response_time_in_ms, "omitnan"));
+    slow = logical(behdata.response_time_in_ms >= median(behdata.response_time_in_ms, "omitnan"));
        
     % channels
     chX = ismember(tl.label, 'eyeX');
@@ -169,6 +177,21 @@ for pp = [2:29];
     saccade.data(7,:) = (saccade.data(3,:) + saccade.data(4,:)) / 2;
     saccade.data(8,:) = (saccade.data(6,:) - saccade.data(7,:)) / 2;
 
+    % add extra comparisons
+    saccade.data(9,:) = (mean(shiftsSW(cueL&correct,:), "omitnan") + mean(shiftsSE(cueR&correct,:), "omitnan")) ./ 2;
+    saccade.data(10,:) = (mean(shiftsSW(cueR&correct,:), "omitnan") + mean(shiftsSE(cueL&correct,:), "omitnan")) ./ 2;
+    saccade.data(11,:) = (saccade.data(9,:) - saccade.data(10,:)) / 2;
+    saccade.data(12,:) = (mean(shiftsSW(cueL&incorrect,:), "omitnan") + mean(shiftsSE(cueR&incorrect,:), "omitnan")) ./ 2;
+    saccade.data(13,:) = (mean(shiftsSW(cueR&incorrect,:), "omitnan") + mean(shiftsSE(cueL&incorrect,:), "omitnan")) ./ 2;
+    saccade.data(14,:) = (saccade.data(12,:) - saccade.data(13,:)) / 2;
+
+    saccade.data(15,:) = (mean(shiftsSW(cueL&fast,:), "omitnan") + mean(shiftsSE(cueR&fast,:), "omitnan")) ./ 2;
+    saccade.data(16,:) = (mean(shiftsSW(cueR&fast,:), "omitnan") + mean(shiftsSE(cueL&fast,:), "omitnan")) ./ 2;
+    saccade.data(17,:) = (saccade.data(15,:) - saccade.data(16,:)) / 2;
+    saccade.data(18,:) = (mean(shiftsSW(cueL&slow,:), "omitnan") + mean(shiftsSE(cueR&slow,:), "omitnan")) ./ 2;
+    saccade.data(19,:) = (mean(shiftsSW(cueR&slow,:), "omitnan") + mean(shiftsSE(cueL&slow,:), "omitnan")) ./ 2;
+    saccade.data(20,:) = (saccade.data(18,:) - saccade.data(19,:)) / 2;
+    
     
     %% smooth and turn to Hz
     integrationwindow = 100; % window over which to integrate saccade counts
